@@ -1,0 +1,80 @@
+---
+stages:
+    - pre-flight
+    - quality
+    - test
+    - build
+    - documentation
+    - deploy
+
+include:
+    -   local: '.gitlab-ci/root.before_script.yml'
+
+    -   local: '.gitlab-ci/pre-flight/prepare-cache.yml'
+
+    -   local: '.gitlab-ci/.junit-report.yml'
+
+    -   local: '.gitlab-ci/quality/php/compatibility.with-report.yml'
+    -   local: '.gitlab-ci/quality/php/duplication.with-report.yml'
+    -   local: '.gitlab-ci/quality/php/standards.with-report.yml'
+
+    -   local: '.gitlab-ci/test/cc.yml'
+    -   local: '.gitlab-ci/test/unit/qunit.yml'
+    -   local: '.gitlab-ci/test/unit/jest.with-report.yml'
+    -   local: '.gitlab-ci/test/unit/php.with-report.yml'
+    -   local: '.gitlab-ci/test/integration/php.yml'
+
+    -   local: '.gitlab-ci/build/branch.yml'
+    -   local: '.gitlab-ci/build/protected-branches.yml'
+    -   local: '.gitlab-ci/build/special-branches.yml'
+
+    -   local: '.gitlab-ci/build/tag.yml'
+
+    -   local: '.gitlab-ci/documentation/release-notes.yml'
+
+    -   local: '.gitlab-ci/deploy/s3.yml'
+
+# Other projects inside the same server must have access to this project and use the following form.
+#
+#include:
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/root.before_script.yml'
+#
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/pre-flight/prepare-cache.yml'
+#
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/.junit-report.yml'
+#
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/quality/php/compatibility.with-report.yml'
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/quality/php/duplication.yml'
+#
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/test/cc.yml'
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/test/unit/jest.with-report.yml'
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/test/unit/php.with-report.yml'
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/test/integration/php.yml'
+#
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/build/branch.yml'
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/build/protected-branches.yml'
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/build/special-branches.yml'
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/build/tag.yml'
+#
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/documentation/release-notes.yml'
+#
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/deploy/s3.yml'
+#
+#
+# Projects outside the same server, must use the `include:remote` form
+# See https://docs.gitlab.com/ee/ci/yaml/README.html#includeremote

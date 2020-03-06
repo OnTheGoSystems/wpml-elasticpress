@@ -1,0 +1,11 @@
+Protected Branch:
+    extends:
+        - .cache-pull
+        - Branch
+    artifacts:
+        expire_in: 1 month
+    except: []
+    only:
+        refs:
+            - master
+            - develop

@@ -1,0 +1,23 @@
+Compatibility <PHP>:
+    stage: quality
+    extends:
+        - .cache-pull
+        - .junit-report
+    when: on_success
+    image: registry.otgs.work/infrastructure/docker-images/phpunit:7.3
+    tags:
+        - autoscale
+    script:
+        - >
+            if [[ -f vendor/bin/phpcs && -f ./phpcs.compatibility.xml ]] ; then
+                vendor/bin/phpcs --standard=./phpcs.compatibility.xml -s -p --colors --report=junit --report-file="${REPORT_FILE_PATH}" ./
+            else
+                echo "Compatibility checks skipped."
+            fi
+    only:
+        refs:
+            - branches
+    except:
+        refs:
+            - stable
+            - bleeding

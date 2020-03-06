@@ -1,0 +1,34 @@
+{
+    "name": "my-project",
+    "version": "1.0.0",
+    "license": "MIT",
+    "scripts": {
+        "build:dev": "webpack --mode development",
+        "build:prod": "webpack -p --env production --mode production",
+        "test": "jest"
+    },
+    "jest": {
+        "automock": false,
+        "testRegex": "./tests/jest/tests/.*.js$",
+        "rootDir": ".",
+        "testURL": "http://domain.tld/",
+        "setupFiles": [
+            "raf/polyfill",
+            "<rootDir>/tests/jest/setupTests.js"
+        ]
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "clean-webpack-plugin": "^3.0.0",
+        "commander": "~2.19",
+        "css-loader": "^3.2.0",
+        "del": "~3.0",
+        "fs-extra": "^7.0.1",
+        "mini-css-extract-plugin": "^0.8.0",
+        "recursive-copy": "^2.0.9",
+        "webpack": "^4.40.2",
+        "webpack-assets-manifest": "^3.1.1",
+        "webpack-cli": "^3.3.9",
+        "yargs": "~12.0"
+    }
+}

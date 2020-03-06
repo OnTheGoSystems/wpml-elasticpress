@@ -1,0 +1,58 @@
+.integration-script:
+    script:
+        - >
+            if [[ ! -f ./vendor/bin/otgs-php-integration-tests || ! -d ./tests/tests || ! -f ./tests/bootstrap.php ]] ; then
+                echo "Integration tests skipped."
+            else
+                if [[ -f ./.make/adjust-phpunit.sh ]] ; then
+                    make adjust-phpunit
+                fi
+                ./vendor/bin/otgs-php-integration-tests ${ARGS}
+            fi
+
+Integration <PHP>:
+    stage: test
+    extends:
+        - .cache-pull
+        - .integration-script
+        - .junit-report
+    when: on_success
+    image: registry.otgs.work/infrastructure/docker-images/wptest:7.3
+    services:
+        - mysql:5.7
+    tags:
+        - autoscale
+    retry:
+        max: 1
+        when: script_failure
+    only:
+        refs:
+            - branches
+    except:
+        refs:
+            - stable
+            - bleeding
+
+Integration <PHP 7.4>:
+    stage: test
+    extends:
+        - .cache-pull
+        - .integration-script
+        - .junit-report
+    allow_failure: true
+    when: on_success
+    image: registry.otgs.work/infrastructure/docker-images/wptest:7.4
+    services:
+        - mysql:5.7
+    tags:
+        - autoscale
+    retry:
+        max: 1
+        when: script_failure
+    only:
+        refs:
+            - branches
+    except:
+        refs:
+            - stable
+            - bleeding

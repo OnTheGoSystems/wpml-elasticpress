@@ -1,0 +1,67 @@
+{
+    "name": "wpml/my-project",
+    "description": "My Project",
+    "license": "GPL-2.0-only",
+    "homepage": "https://wpml.org",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "WPML",
+            "email": "hello@wpml.com",
+            "homepage": "http://wpml.org"
+        }
+    ],
+    "repositories": {
+        "otgs-build-tools-ci": {
+            "type": "vcs",
+            "url": "ssh://git@git.onthegosystems.com:10022/shared/otgs-build-tools-ci.git"
+        },
+        "otgs-changelog": {
+            "type": "vcs",
+            "url": "ssh://git@git.onthegosystems.com:10022/shared/otgs-changelog.git"
+        },
+        "wp-plugin-version": {
+            "type": "vcs",
+            "url": "ssh://git@git.onthegosystems.com:10022/shared/otgs-wp-plugin-version.git"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "platform": {
+            "php": "5.6"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "otgs/ui": "dev-master",
+        "otgs/icons": "dev-master"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-master",
+        "otgs/unit-tests-framework": "~1.2.0",
+        "otgs/changelog": "dev-develop",
+        "sebastian/phpcpd": "^3.0",
+        "otgs/build-tools-ci": "dev-master",
+        "otgs/wp-plugin-version": "dev-master",
+        "squizlabs/php_codesniffer": "~3",
+        "phpcompatibility/php-compatibility": "*",
+        "phpcompatibility/phpcompatibility-wp": "*",
+        "dealerdirect/phpcodesniffer-composer-installer": "*",
+        "wp-coding-standards/wpcs": "^0"
+    },
+    "scripts": {
+        "make": [
+            "make githooks"
+        ],
+          "post-install-cmd": [
+            "@make"
+        ]
+    },
+    "autoload": {
+        "classmap": []
+    },
+    "autoload-dev": {
+        "classmap": []
+    }
+}

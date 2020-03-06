@@ -1,0 +1,85 @@
+# Exclusions
+
+## Directories
+
+__MACOSX
+
+.idea
+.sass-cache
+tags
+
+embedded/
+build/vendor/
+tests/phpunit/vendor/
+vendor/**
+dist/**
+node_modules
+
+/build/dist
+%{TEMP}
+
+tests/vendor
+tests/wordpress-develop
+tests/wordpress-tests-lib
+tests/wordpress
+
+### The following are created during the build project
+/sitepress-multilingual-cms
+/wpml-translation-management
+/wpml-string-translation
+/wpml-sticky-links
+/wpml-media-translation
+/wpml-cms-nav
+/gravityforms-multilingual
+/woocommerce-multilingual
+/woocommerce-bookings
+/woocommerce
+
+## Files
+
+Thumbs.db
+/tests/compatibility/*.txt
+.DS_Store
+
+inc/sandbox.inc
+*.sh
+*.iml
+build.xml
+*.komodoproject
+yarn-error.log
+
+### The following are created during the build project
+/sitepress-multilingual-cms.zip
+/wpml-translation-management.zip
+/wpml-string-translation.zip
+/wpml-sticky-links.zip
+/wpml-media-translation.zip
+/wpml-cms-nav.zip
+/gravityforms-multilingual.zip
+/woocommerce-multilingual.zip
+
+
+# Exceptions
+
+## Directories
+
+!tests/js/vendor
+!.githooks
+
+## Files
+
+!/build/*.sh
+!/build/ci/*.sh
+
+!tests/install-wp-tests.sh
+
+!/tests/compatibility/run.sh
+
+!.githooks/*.sh
+!.make/*.sh
+!/run.sh
+!/Makefile
+!package-lock.json
+
+# Add the following in all WPML plugins
+# .make

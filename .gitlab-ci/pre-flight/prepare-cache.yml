@@ -1,0 +1,47 @@
+Prepare <Cache>:
+    stage: pre-flight
+    cache: &cache-commit
+        untracked: true
+        key: "$CI_COMMIT_REF_NAME"
+        paths:
+            - node_modules/
+            - vendor/
+            - changelog/
+            - libraries/
+            - dist/
+            - readme.txt
+            - .make
+        policy: push
+    when: always
+    image: registry.otgs.work/infrastructure/docker-images/phpunit:7.3
+    tags:
+        - autoscale
+    script:
+        - >
+            if [[ -f Makefile ]] ; then
+                echo "Installing via Makefile"
+                make install
+            else
+                if [[ -f package.json ]] ; then
+                    npm install
+                else
+                    echo "npm skipped."
+                fi
+                if [[ -f composer.json ]] ; then
+                    composer install
+                    composer update otgs/php-integration-tests
+                else
+                    echo "composer skipped."
+                fi
+            fi
+        - >
+            if [[ -f ./vendor/bin/otgs-changelog && -n "$OTGS_CI_YOUTRACK_PROJECT_ID" ]] ; then
+                ./vendor/bin/otgs-changelog update --project ${OTGS_CI_YOUTRACK_PROJECT_ID} --target-version all --max-major-versions=5 --last-minor-version-only --path ./changelog --filename-template {version}.md
+            else
+                echo "otgs-changelog skipped."
+            fi
+
+.cache-pull:
+    cache:
+        <<: *cache-commit
+        policy: pull

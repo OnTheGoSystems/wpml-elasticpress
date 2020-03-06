@@ -1,0 +1,22 @@
+Standards <PHP>:
+    stage: quality
+    extends:
+        - .cache-pull
+    when: on_success
+    image: registry.otgs.work/infrastructure/docker-images/phpunit:7.3
+    tags:
+        - autoscale
+    script:
+        - >
+            if [[ -f vendor/bin/phpcs && -f ./phpcs.xml ]] ; then
+                vendor/bin/phpcs --standard=./phpcs.xml -s -p --colors --report-full --report-summary ./
+            else
+                echo "Standards checks skipped."
+            fi
+    only:
+        refs:
+            - branches
+    except:
+        refs:
+            - stable
+            - bleeding

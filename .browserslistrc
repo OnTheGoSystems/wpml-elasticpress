@@ -1,0 +1,7 @@
+# Browsers that we support
+# Run `npx browserslist` to see what browsers are selected by this queries
+# More [here](https://github.com/browserslist/browserslist)
+
+> 5%
+Last 2 versions
+Safari 6
