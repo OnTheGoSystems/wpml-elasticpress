@@ -7,8 +7,6 @@ stages:
     - documentation
     - deploy
 
-# Other projects inside the same server must have access to this project and use the following form.
-#
 include:
     -   project: 'wpml/wpml-plugin-template'
         file: '.gitlab-ci/root.before_script.yml'
@@ -24,14 +22,14 @@ include:
     -   project: 'wpml/wpml-plugin-template'
         file: '.gitlab-ci/quality/php/duplication.yml'
 
-    -   project: 'wpml/wpml-plugin-template'
-        file: '.gitlab-ci/test/cc.yml'
-    -   project: 'wpml/wpml-plugin-template'
-        file: '.gitlab-ci/test/unit/jest.with-report.yml'
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/test/cc.yml'
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/test/unit/jest.with-report.yml'
     -   project: 'wpml/wpml-plugin-template'
         file: '.gitlab-ci/test/unit/php.with-report.yml'
-    -   project: 'wpml/wpml-plugin-template'
-        file: '.gitlab-ci/test/integration/php.yml'
+#    -   project: 'wpml/wpml-plugin-template'
+#        file: '.gitlab-ci/test/integration/php.yml'
 
     -   project: 'wpml/wpml-plugin-template'
         file: '.gitlab-ci/build/branch.yml'
@@ -47,7 +45,3 @@ include:
 
     -   project: 'wpml/wpml-plugin-template'
         file: '.gitlab-ci/deploy/s3.yml'
-
-
-# Projects outside the same server, must use the `include:remote` form
-# See https://docs.gitlab.com/ee/ci/yaml/README.html#includeremote
