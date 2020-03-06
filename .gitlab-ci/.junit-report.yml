@@ -1,8 +1,0 @@
-.junit-report:
-    variables:
-        REPORT_FILE_PATH: "report-${CI_JOB_ID}.xml"
-    artifacts:
-        paths:
-            - "${REPORT_FILE_PATH}"
-        reports:
-            junit: "${REPORT_FILE_PATH}"
