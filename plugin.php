@@ -1,15 +1,27 @@
 <?php
-/*
-Plugin Name: WPML ElasticPRess
-Description: Provides compatibility between WPML and ElasticPress
-Author: OnTheGoSystems
-Author URI: http://www.onthegosystems.com
-Version: 0.0.1
-Plugin Slug: wpml-elasticpress
-*/
+/**
+ * Plugin Name: WPML ElasticPress Integration
+ * Plugin URI:
+ * Description: It adds support for languages in ElasticPress searching query. Results contain only posts from a current language.
+ * Author: OnTheGoSystems
+ * Author URI: http://www.onthegosystems.com/
+ * Version: 1.0.0
+ * Plugin Slug: wpmlelasticpress
+ *
+ * @package wpml/bridge/elasticpress
+ */
 
-define( 'MY_NEW_PLUGIN_PATH', __DIR__ );
-define( 'MY_NEW_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
+if ( defined( 'WPMLELASTICPRESS_VERSION' ) ) {
+    return;
+}
 
-require_once MY_NEW_PLUGIN_PATH . '/vendor/autoload.php';
+if ( ! defined( 'EP_VERSION' ) || version_compare( EP_VERSION, '3.0.0', '<' ) ) {
+	return;
+}
 
+define( 'WPMLELASTICPRESS_VERSION', '1.0.0' );
+define( 'WPMLELASTICPRESS_PLUGIN_PATH', dirname( __FILE__ ) );
+
+require_once WPMLELASTICPRESS_PLUGIN_PATH . '/vendor/autoload.php';
+
+\WPML\ElasticPress\Plugin::init();

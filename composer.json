@@ -59,7 +59,9 @@
         ]
     },
     "autoload": {
-        "classmap": []
+        "psr-4": {
+            "WPML\\ElasticPress\\": "src/"
+        }
     },
     "autoload-dev": {
         "classmap": []
