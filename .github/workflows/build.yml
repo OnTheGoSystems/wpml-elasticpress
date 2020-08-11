@@ -1,0 +1,30 @@
+name: OTGS BUILD
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set github token for composer
+        run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build plugin
+        run: composer install --no-dev --prefer-dist --no-progress --no-suggest
+
+      - name: Clean up files
+        run: |
+          rm ./.browserslistrc ./.eslintrc ./.gitignore ./.gitlab-ci.yml
+          rm ./composer.* ./Makefile ./package.json ./package-lock.json ./phpcs.* ./phpunit.xml ./run.sh
+          rm -Rf tests
+          find . -type d | grep '.git' | xargs rm -rf
+
+      - name: Upload plugin
+        uses: actions/upload-artifact@v2
+        with:
+          name: wpml-elasticpress.zip
+          path: .
