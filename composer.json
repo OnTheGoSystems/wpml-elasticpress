@@ -33,10 +33,6 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "require": {
-        "otgs/ui": "dev-master",
-        "otgs/icons": "dev-master"
-    },
     "require-dev": {
         "roave/security-advisories": "dev-master",
         "otgs/unit-tests-framework": "~1.2.0",
