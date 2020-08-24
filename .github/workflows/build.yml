@@ -18,8 +18,8 @@ jobs:
 
       - name: Clean up files
         run: |
-          rm ./.browserslistrc ./.eslintrc ./.gitignore ./.gitlab-ci.yml
-          rm ./composer.* ./Makefile ./package.json ./package-lock.json ./phpcs.* ./phpunit.xml ./run.sh
+          rm ./.gitignore ./.gitlab-ci.yml
+          rm ./composer.* ./Makefile ./phpcs.* ./phpunit.xml ./run.sh
           rm -Rf tests
           find . -type d | grep '.git' | xargs rm -rf
 
