@@ -10,7 +10,7 @@
  *
  * @package wpml/bridge/elasticpress
  */
-
+namespace WPML\ElasticPress;
 if ( defined( 'WPMLELASTICPRESS_VERSION' ) ) {
     return;
 }
@@ -22,6 +22,6 @@ if ( ! defined( 'EP_VERSION' ) || version_compare( EP_VERSION, '3.0.0', '<' ) ) 
 define( 'WPMLELASTICPRESS_VERSION', '1.0.0' );
 define( 'WPMLELASTICPRESS_PLUGIN_PATH', dirname( __FILE__ ) );
 
-require_once WPMLELASTICPRESS_PLUGIN_PATH . '/vendor/autoload.php';
+require_once WPMLELASTICPRESS_PLUGIN_PATH . '/autoload.php';
 
-\WPML\ElasticPress\Plugin::init();
+Plugin::init();
