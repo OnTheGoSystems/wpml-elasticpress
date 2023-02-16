@@ -18,6 +18,13 @@ You can use it in this way:
 
 `wp wpml_elasticpress index --post-type=post --post-lang=de` which will index only German posts.
 
+## Building from source
+
+After cloning this repository you need to generate the autoloader:
+`composer dumpautoload`
+
+This step isn't needed if you download a release instead.
+
 ## Changelog
 
 ### 1.0.0
