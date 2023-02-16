@@ -8,6 +8,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
       - name: Set github token for composer
         run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
 
