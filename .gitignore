@@ -82,4 +82,4 @@ yarn-error.log
 !package-lock.json
 
 # Add the following in all WPML plugins
-# .make
+.make
