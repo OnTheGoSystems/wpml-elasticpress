@@ -42,7 +42,7 @@ class LanguageSearch {
 	public function filterByLang( $args ) {
 		$args['post_filter']['bool']['must'][] = [
 			'term' => [
-				'post_lang' => $this->getQueryLang(),
+				'post_lang.keyword' => $this->getQueryLang(),
 			],
 		];
 
