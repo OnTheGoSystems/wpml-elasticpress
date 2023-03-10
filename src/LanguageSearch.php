@@ -29,7 +29,21 @@ class LanguageSearch {
 	 * @return array
 	 */
 	public function addLangInfo( $post_args, $post_id ) {
-		$post_args['post_lang'] = $this->getPostLang( $post_args, $post_id );
+		if ( ! $this->sitepress->is_display_as_translated_post_type( $post_args["post_type"] ) ) {
+			$post_args['post_lang'] = $this->getPostLang( $post_args, $post_id );
+		} else {
+			$active_languages = array_keys( $this->sitepress->get_active_languages() );
+			$trid             = apply_filters( 'wpml_element_trid', null, $post_id, 'post_' . $post_args["post_type"] );
+			$translations     = apply_filters( 'wpml_get_element_translations', null, $trid, 'post_' . $post_args["post_type"] );
+			foreach ( $active_languages as $language ) {
+				if ( array_key_exists( $language, $translations ) && $translations[ $language ]->element_id != $post_id ) {
+					if ( ( $key = array_search( $language, $active_languages ) ) !== false ) {
+						unset( $active_languages[ $key ] );
+					}
+				}
+			}
+			$post_args['post_lang'] = implode( ',', $active_languages );
+		}
 
 		return $post_args;
 	}
