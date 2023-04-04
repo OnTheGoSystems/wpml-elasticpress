@@ -27,12 +27,15 @@ class LanguageSearchTest extends \OTGS_TestCase {
 		$translation_element_factory = $this->getMockBuilder( 'WPML_Translation_Element_Factory' )->setMethods( [ 'create' ] )->getMock();
 		$translation_element_factory->method( 'create' )->with( $post_id, 'post' )->willReturn( $post_element );
 
-		$post_args       = [ 'ID' => $post_id, 'post_title' => 'publish' ];
+		$post_args       = [ 'ID' => $post_id, 'post_title' => 'publish', 'post_type' => 'custom' ];
 		$expected_result = $post_args + [ 'post_lang' => 'en' ];
+
+		$sitepress = $this->get_sitepress();
+		$sitepress->method( 'is_display_as_translated_post_type' )->willReturn( false );
 
 		$subject = new LanguageSearch(
 			$translation_element_factory,
-			$sitepress = $this->get_sitepress()
+			$sitepress
 		);
 		$result  = $subject->addLangInfo( $post_args, $post_id );
 
@@ -52,10 +55,13 @@ class LanguageSearchTest extends \OTGS_TestCase {
 		$translation_element_factory = $this->get_element_factory();
 		$translation_element_factory->method( 'create' )->with( $post_id, 'post' )->willReturn( $post_element );
 
-		$post_args       = [ 'ID' => $post_id, 'post_title' => 'publish' ];
+		$post_args       = [ 'ID' => $post_id, 'post_title' => 'publish', 'post_type' => 'custom' ];
 		$expected_result = $post_args + [ 'post_lang' => $lang ];
 
-		$subject = new LanguageSearch( $translation_element_factory, $sitepress = $this->get_sitepress() );
+		$sitepress = $this->get_sitepress();
+		$sitepress->method( 'is_display_as_translated_post_type' )->willReturn( false );
+
+		$subject = new LanguageSearch( $translation_element_factory, $sitepress );
 		$result  = $subject->addLangInfo( $post_args, $post_id );
 
 		$this->assertEquals( $expected_result, $result );
@@ -77,12 +83,15 @@ class LanguageSearchTest extends \OTGS_TestCase {
 		$translation_element_factory = $this->get_element_factory();
 		$translation_element_factory->method( 'create' )->with( $post_id, 'post' )->willReturn( $post_element );
 
-		$post_args       = [ 'ID' => $post_id, 'post_title' => 'publish', 'guid' => $guid ];
+		$post_args       = [ 'ID' => $post_id, 'post_title' => 'publish', 'guid' => $guid, 'post_type' => 'custom' ];
 		$expected_result = $post_args + [ 'post_lang' => $expected_lang ];
+
+		$sitepress = $this->get_sitepress();
+		$sitepress->method( 'is_display_as_translated_post_type' )->willReturn( false );
 
 		$subject = new LanguageSearch(
 			$translation_element_factory,
-			$sitepress = $this->get_sitepress()
+			$sitepress
 		);
 		$result  = $subject->addLangInfo( $post_args, $post_id );
 
@@ -104,6 +113,98 @@ class LanguageSearchTest extends \OTGS_TestCase {
 			[ 'https://fr.wpml.org/vorzeigeprojekte/rjrinnovations-com', 'fr' ],
 			[ 'http://pt-br.wpml.org/vorzeigeprojekte/rjrinnovations-com', 'pt-br' ],
 		];
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_adds_lang_on_display_as_translated() {
+		$post_id   = 21;
+		$trid      = 99;
+		$post_args = [ 'ID' => $post_id, 'post_title' => 'publish', 'post_type' => 'custom' ];
+
+		\WP_Mock::onFilter( 'wpml_element_trid' )
+			->with( null )
+			->reply( $trid );
+		\WP_Mock::onFilter( 'wpml_get_element_translations' )
+			->with( null )
+			->reply( array(
+				'en'    => (object) array(
+					'element_id' => $post_id,
+				),
+				'pt-br' => (object) array(
+					'element_id' => 55,
+				),
+				'it'    => (object) array(
+					'element_id' => 66,
+				),
+			) );
+
+		$translation_element_factory = $this->get_element_factory();
+
+		$sitepress = $this->get_sitepress();
+		$sitepress->method( 'is_display_as_translated_post_type' )->willReturn( true );
+
+		$expected_result = $post_args + [ 'post_lang' => 'en,fr,de' ];
+
+		$subject = new LanguageSearch(
+			$translation_element_factory,
+			$sitepress
+		);
+		$result  = $subject->addLangInfo( $post_args, $post_id );
+
+		$this->assertEquals( $expected_result, $result );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_adds_lang_on_display_as_translated_with_missing_translations() {
+		$post_id   = 21;
+		$trid      = 99;
+		$post_args = [ 'ID' => $post_id, 'post_title' => 'publish', 'post_type' => 'custom' ];
+
+		\WP_Mock::onFilter( 'wpml_element_trid' )
+			->with( null )
+			->reply( $trid );
+		\WP_Mock::onFilter( 'wpml_get_element_translations' )
+			->with( null )
+			->reply( array(
+				'en'    => (object) array(
+					'element_id' => 33,
+				),
+				'fr'    => (object) array(
+					'element_id' => 44,
+				),
+				'de'    => (object) array(
+					'element_id' => 55,
+				),
+				'pt-br' => (object) array(
+					'element_id' => 66,
+				),
+				'it'    => (object) array(
+					'element_id' => 77,
+				),
+			) );
+
+		$post_element = $this->getMockBuilder( 'WPML_Post_Element' )->setMethods( [ 'get_language_code' ] )->getMock();
+		$post_element->method( 'get_language_code' )->willReturn( null );
+
+		$translation_element_factory = $this->get_element_factory();
+		$translation_element_factory->method( 'create' )->with( $post_id, 'post' )->willReturn( $post_element );
+
+		$sitepress = $this->get_sitepress();
+		$sitepress->method( 'is_display_as_translated_post_type' )->willReturn( true );
+
+		$expected_result = $post_args + [ 'post_lang' => 'en' ];
+
+		$subject = new LanguageSearch(
+			$translation_element_factory,
+			$sitepress
+		);
+		$result  = $subject->addLangInfo( $post_args, $post_id );
+
+		$this->assertEquals( $expected_result, $result );
 	}
 
 	/**
@@ -166,6 +267,7 @@ class LanguageSearchTest extends \OTGS_TestCase {
 		$sitepress = $this->getMockBuilder( 'SitePress' )->setMethods( [
 			'get_active_languages',
 			'get_current_language',
+			'is_display_as_translated_post_type',
 		] )->getMock();
 		$sitepress->method( 'get_active_languages' )->willReturn( $active_langs );
 
