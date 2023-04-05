@@ -15,7 +15,10 @@ class Plugin {
 						new \WPML_Translation_Element_Factory( $sitepress ),
 						$sitepress
 					),
-					new IndexingLangParam( $sitepress )
+					new IndexingLangParam(
+						\ElasticPress\Elasticsearch::factory(),
+						$sitepress
+					)
 				);
 
 				\ElasticPress\Features::factory()->register_feature( $feature );

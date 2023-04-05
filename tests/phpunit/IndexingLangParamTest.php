@@ -10,10 +10,14 @@ class IndexingLangParamTest extends \OTGS_TestCase {
 	 * @test
 	 */
 	public function itAddsHooks() {
-		$subject = new IndexingLangParam( $this->getSitePresMock() );
+		$subject = new IndexingLangParam(
+			$this->getElasticsearchMock(),
+			$this->getSitePresMock()
+		);
 
 		\WP_Mock::expectActionAdded( 'ep_pre_dashboard_index', [ $subject, 'setsALLLangForDashboardIndexing' ], 10, 0 );
 		\WP_Mock::expectActionAdded( 'ep_wp_cli_pre_index', [ $subject, 'setLangForCLIIndexing' ], 10, 2 );
+		\WP_Mock::expectFilterAdded( 'ep_post_mapping', [ $subject, 'mapping' ] );
 
 		$subject->addHooks();
 	}
@@ -25,7 +29,7 @@ class IndexingLangParamTest extends \OTGS_TestCase {
 		$sitepress = $this->getSitePresMock();
 		$sitepress->expects( $this->once() )->method( 'switch_lang' )->with( 'all' );
 
-		$subject = new IndexingLangParam( $sitepress );
+		$subject = new IndexingLangParam( $this->getElasticsearchMock(), $sitepress );
 		$subject->setLangForCLIIndexing( [], [] );
 	}
 
@@ -37,7 +41,7 @@ class IndexingLangParamTest extends \OTGS_TestCase {
 		$sitepress = $this->getSitePresMock();
 		$sitepress->expects( $this->once() )->method( 'switch_lang' )->with( $lang );
 
-		$subject = new IndexingLangParam( $sitepress );
+		$subject = new IndexingLangParam( $this->getElasticsearchMock(), $sitepress );
 		$subject->setLangForCLIIndexing( [], [ 'post-lang' => $lang ] );
 	}
 
@@ -49,10 +53,117 @@ class IndexingLangParamTest extends \OTGS_TestCase {
 		$sitepress = $this->getSitePresMock();
 		$sitepress->expects( $this->once() )->method( 'switch_lang' )->with( 'all' );
 
-		$subject = new IndexingLangParam( $sitepress );
+		$subject = new IndexingLangParam( $this->getElasticsearchMock(), $sitepress );
 		$subject->setLangForCLIIndexing( [], [ 'post-lang' => $lang ] );
 	}
 
+	/**
+	 * @test
+	 */
+	public function itSetsUnfilteredAnalyzerForPostLangField() {
+		$elasticsearch = $this->getElasticsearchMock();
+		$elasticsearch->expects( $this->once() )->method( 'get_elasticsearch_version' )->willReturn( '7.10' );
+
+		$mapping = [
+			'settings' => [
+				'analysis' => [
+					'analyzer' => [],
+				],
+			],
+			'mappings' => [
+				'properties' => [],
+			],
+		];
+
+		$expected = [
+			'settings' => [
+				'analysis' => [
+					'analyzer' => [
+						'post_lang_field' => [
+							'type'      => 'custom',
+							'tokenizer' => 'standard',
+							'filter'    => [],
+						],
+					],
+				],
+			],
+			'mappings' => [
+				'properties' => [
+					'post_lang' => [
+						'type'     => 'text',
+						'analyzer' => 'post_lang_field',
+					],
+				],
+			],
+		];
+
+		$subject = new IndexingLangParam(
+			$elasticsearch,
+			$this->getSitePresMock()
+		);
+
+		$this->assertSame( $expected, $subject->mapping( $mapping ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function itSetsUnfilteredAnalyzerForPostLangFieldOnLegacyElasticsearch() {
+		$elasticsearch = $this->getElasticsearchMock();
+		$elasticsearch->expects( $this->once() )->method( 'get_elasticsearch_version' )->willReturn( '6.9' );
+
+		$mapping = [
+			'settings' => [
+				'analysis' => [
+					'analyzer' => [],
+				],
+			],
+			'mappings' => [
+				'post' => [
+					'properties' => [],
+				],
+			],
+		];
+
+		$expected = [
+			'settings' => [
+				'analysis' => [
+					'analyzer' => [
+						'post_lang_field' => [
+							'type'      => 'custom',
+							'tokenizer' => 'standard',
+							'filter'    => [],
+						],
+					],
+				],
+			],
+			'mappings' => [
+				'post' => [
+					'properties' => [
+						'post_lang' => [
+							'type'     => 'text',
+							'analyzer' => 'post_lang_field',
+						],
+					],
+				],
+			],
+		];
+
+		$subject = new IndexingLangParam(
+			$elasticsearch,
+			$this->getSitePresMock()
+		);
+
+		$this->assertSame( $expected, $subject->mapping( $mapping ) );
+	}
+
+	private function getElasticsearchMock() {
+		$elasticsearch = $this->getMockBuilder( '\ElasticPress\Elasticsearch' )->setMethods( [
+			'get_elasticsearch_version'
+		] )->getMock();
+
+		return $elasticsearch;
+	}
 
 	private function getSitePresMock() {
 		$sitepress = $this->getMockBuilder( '\Sitepress' )->setMethods( [
