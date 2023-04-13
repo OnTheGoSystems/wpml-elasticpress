@@ -55,6 +55,7 @@ class IndexingLangParam {
 
 	/**
 	 * @param  array $mapping
+	 *
 	 * @return array
 	 */
 	public function mapping( $mapping ) {
@@ -72,7 +73,7 @@ class IndexingLangParam {
 			$mapping_properties = &$mapping['mappings']['properties'];
 		}
 
-		// Apply the analized.
+		// Apply the analyzer.
 		$mapping_properties['post_lang']['type']     = 'text';
 		$mapping_properties['post_lang']['analyzer'] = 'post_lang_field';
 
