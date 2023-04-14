@@ -29,7 +29,11 @@ class LanguageSearch {
 	 * @return array
 	 */
 	public function addLangInfo( $post_args, $post_id ) {
-		$post_args['post_lang'] = $this->getPostLang( $post_args, $post_id );
+		if ( $this->sitepress->is_display_as_translated_post_type( $post_args['post_type'] ) ) {
+			$post_args['post_lang'] = $this->getPostLangAsTranslated( $post_args, $post_id );
+		} else {
+			$post_args['post_lang'] = $this->getPostLang( $post_args, $post_id );
+		}
 
 		return $post_args;
 	}
@@ -73,6 +77,24 @@ class LanguageSearch {
 		}
 
 		return $lang;
+	}
+
+	private function getPostLangAsTranslated( $post_args, $post_id ) {
+		$active_languages = array_keys( $this->sitepress->get_active_languages() );
+		$element_type     = apply_filters( 'wpml_element_type', $post_args['post_type'] );
+		$trid             = apply_filters( 'wpml_element_trid', null, $post_id, $element_type );
+		$translations     = apply_filters( 'wpml_get_element_translations', null, $trid, $element_type );
+		foreach ( $active_languages as $key => $language ) {
+			if ( array_key_exists( $language, $translations ) && $translations[ $language ]->element_id != $post_id ) {
+				unset( $active_languages[ $key ] );
+			}
+		}
+
+		if ( empty( $active_languages ) ) {
+			return $this->getPostLang( $post_args, $post_id );
+		}
+
+		return implode( ',', $active_languages );
 	}
 
 	private function buildLangPattern() {
