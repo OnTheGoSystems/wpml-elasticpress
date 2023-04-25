@@ -15,8 +15,9 @@ class IndexingLangParamTest extends \OTGS_TestCase {
 			$this->getSitePresMock()
 		);
 
-		\WP_Mock::expectActionAdded( 'ep_pre_dashboard_index', [ $subject, 'setsALLLangForDashboardIndexing' ], 10, 0 );
+		\WP_Mock::expectFilterAdded( 'ep_dashboard_index_args', [ $subject, 'setDashboardIndexArgs' ] );
 		\WP_Mock::expectActionAdded( 'ep_wp_cli_pre_index', [ $subject, 'setLangForCLIIndexing' ], 10, 2 );
+		\WP_Mock::expectFilterAdded( 'ep_cli_index_args', [ $subject, 'setCliIndexArgs' ] );
 		\WP_Mock::expectFilterAdded( 'ep_post_mapping', [ $subject, 'mapping' ] );
 
 		$subject->addHooks();

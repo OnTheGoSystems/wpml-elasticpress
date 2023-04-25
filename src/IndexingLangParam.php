@@ -24,17 +24,48 @@ class IndexingLangParam {
 
 
 	public function addHooks() {
-		add_action( 'ep_pre_dashboard_index', [ $this, 'setsALLLangForDashboardIndexing' ], 10, 0 );
+		add_filter( 'ep_dashboard_index_args', [ $this, 'setDashboardIndexArgs' ] );
 		add_action( 'ep_wp_cli_pre_index', [ $this, 'setLangForCLIIndexing' ], 10, 2 );
+		add_filter( 'ep_cli_index_args', [ $this, 'setCliIndexArgs' ] );
 		add_filter( 'ep_post_mapping', [ $this, 'mapping' ] );
 	}
 
-	public function setsALLLangForDashboardIndexing() {
-		$this->sitepress->switch_lang( 'all' );
+	/**
+	 * Dashboard index includes all posts
+	 *
+	 * @param  array $args
+	 *
+	 * @return array
+	 */
+	public function setDashboardIndexArgs( $args ) {
+		$args['suppress_wpml_where_and_join_filter'] = true;
+		return $args;
 	}
 
+	/**
+	 * Set lang for CLI index based on the --post-lang flag
+	 *
+	 * @param  array $args
+	 * @param  array $assocArgs
+	 *
+	 * @return array
+	 */
 	public function setLangForCLIIndexing( array $args, array $assocArgs ) {
 		$this->sitepress->switch_lang( $this->getLangFromArgs( $assocArgs ) );
+	}
+
+	/**
+	 * CLI index might include all posts
+	 *
+	 * @param  array $args
+	 *
+	 * @return array
+	 */
+	public function setCliIndexArgs( $args ) {
+		if ( 'all' === apply_filters( 'wpml_current_language', null ) ) {
+			$args['suppress_wpml_where_and_join_filter'] = true;
+		}
+		return $args;
 	}
 
 	/**
