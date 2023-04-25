@@ -15,9 +15,12 @@ class Command extends \ElasticPress\Command {
 	 * @param array  $assoc_args  Associative CLI args.
 	 *
 	 * @since 0.1.2
-	 * @deprecated
+	 * @deprecated on ElasticPress 4.4.0
 	 */
 	public function index( $args, $assoc_args ) {
+		if ( version_compare( EP_VERSION, '4.4.0', '<' ) ) {
+			return parent::index( $args, $assoc_args );
+		}
 		return parent::sync( $args, $assoc_args );
 	}
 
@@ -29,6 +32,6 @@ class Command extends \ElasticPress\Command {
 	 * @param array  $assoc_args  Associative CLI args.
 	 */
 	public function sync( $args, $assoc_args ) {
-		return parent::sync( $args, $assoc_args );
+		return $this->index( $args, $assoc_args );
 	}
 }
