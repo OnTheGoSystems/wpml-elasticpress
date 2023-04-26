@@ -8,16 +8,21 @@ class Plugin {
 	public static function init() {
 		add_action( 'plugins_loaded', function () {
 			if ( defined( 'EP_VERSION' ) && defined( 'ICL_SITEPRESS_VERSION' ) ) {
-				global $sitepress;
+				$active_languages_data = apply_filters( 'wpml_active_languages', [] );
+				$active_languages      = array_keys( $active_languages_data );
 
 				$feature = new Feature(
-					new LanguageSearch(
-						new \WPML_Translation_Element_Factory( $sitepress ),
-						$sitepress
-					),
-					new IndexingLangParam(
+					new Field\Search(
 						\ElasticPress\Elasticsearch::factory(),
-						$sitepress
+						$active_languages
+					),
+					new Field\Sync(
+						\ElasticPress\Elasticsearch::factory(),
+						$active_languages
+					),
+					new Sync\Dashboard(),
+					new Sync\CLI(
+						$active_languages
 					)
 				);
 

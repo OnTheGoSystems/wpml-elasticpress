@@ -1,6 +1,6 @@
 {
-    "name": "wpml/my-project",
-    "description": "My Project",
+    "name": "wpml/elasticpress",
+    "description": "WPML ElasticPress",
     "license": "GPL-2.0-only",
     "homepage": "https://wpml.org",
     "type": "wordpress-plugin",
