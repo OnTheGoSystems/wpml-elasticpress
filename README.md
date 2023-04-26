@@ -16,7 +16,7 @@ It lets us filter them later.
 We also added the extra `--post-lang` argument in CLI indexing command.
 You can use it in this way:
 
-`wp wpml_elasticpress index --post-type=post --post-lang=de` which will index only German posts.
+`wp wpml_elasticpress sync --post-type=post --post-lang=de` which will index only German posts.
 
 ## Building from source
 
