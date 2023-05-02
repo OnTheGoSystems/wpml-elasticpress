@@ -3,6 +3,7 @@
 namespace WPML\ElasticPress;
 
 class Feature extends \ElasticPress\Feature {
+
 	/** @var Field\Search */
 	private $fieldSearch;
 
@@ -12,25 +13,49 @@ class Feature extends \ElasticPress\Feature {
 	/** @var Sync\Dashboard */
 	private $syncDashboard;
 
+	/** @var Sync\Singular */
+	private $syncSingular;
+
 	/** @var Sync\CLI */
 	private $syncCli;
 
+	/** @var Frontend\Search */
+	private $frontendSearch;
+
+	/** @var Stats\Health */
+	private $statsHealth;
+
+	/** @var Stats\Report */
+	private $statsReport;
+
 	/**
-	 * @param Field\Search   $fieldSearch
-	 * @param Field\Sync     $fieldSync
-	 * @param Sync\Dashboard $syncDashboard
-	 * @param Sync\CLI       $syncCli
+	 * @param Field\Search    $fieldSearch
+	 * @param Field\Sync      $fieldSync
+	 * @param Sync\Dashboard  $syncDashboard
+	 * @param Sync\singular   $syncSingular
+	 * @param Sync\CLI        $syncCli
+	 * @param Frontend\Search $frontendSearch
+	 * @param Stats\Health    $statsHealth
+	 * @param Stats\Report    $statsHealth
 	 */
 	public function __construct(
-		Field\Search   $fieldSearch,
-		Field\Sync     $fieldSync,
-		Sync\Dashboard $syncDashboard,
-		Sync\CLI       $syncCli
+		Field\Search    $fieldSearch,
+		Field\Sync      $fieldSync,
+		Sync\Dashboard  $syncDashboard,
+		Sync\Singular   $syncSingular,
+		Sync\CLI        $syncCli,
+		Frontend\Search $frontendSearch,
+		Stats\Health    $statsHealth,
+		Stats\Report    $statsReport
 	) {
-		$this->fieldSearch   = $fieldSearch;
-		$this->fieldSync     = $fieldSync;
-		$this->syncDashboard = $syncDashboard;
-		$this->syncCli       = $syncCli;
+		$this->fieldSearch    = $fieldSearch;
+		$this->fieldSync      = $fieldSync;
+		$this->syncDashboard  = $syncDashboard;
+		$this->syncSingular   = $syncSingular;
+		$this->syncCli        = $syncCli;
+		$this->frontendSearch = $frontendSearch;
+		$this->statsHealth    = $statsHealth;
+		$this->statsReport    = $statsReport;
 
 		$this->slug                     = 'wpml';
 		$this->title                    = esc_html__( 'WPML integration', 'sitepress' );
@@ -43,7 +68,11 @@ class Feature extends \ElasticPress\Feature {
 		$this->fieldSearch->addHooks();
 		$this->fieldSync->addHooks();
 		$this->syncDashboard->addHooks();
+		$this->syncSingular->addHooks();
 		$this->syncCli->addHooks();
+		$this->frontendSearch->addHooks();
+		$this->statsHealth->addHooks();
+		$this->statsReport->addHooks();
 	}
 
 	public function output_feature_box_summary() {

@@ -5,40 +5,51 @@ namespace WPML\ElasticPress;
 use ElasticPress\Elasticsearch;
 
 abstract class Field {
-	/** @var Elasticsearch */
-	protected $elasticsearch;
+
+	const FIELD_SLUG = 'post_lang';
+
+	/** @var string */
+	protected $elasticsearchVersion;
 
 	/** @var array */
-	protected $active_languages;
+	protected $activeLanguages;
+
+	/** @var string */
+	protected $defaultLanguage;
+
+	/** @var string */
+	protected $currentLanguage;
 
 	/**
-	 * @param array $active_languages
+	 * @param string $elasticsearchVersion
+	 * @param array  $activeLanguages
+	 * @param string $defaultLanguage
+	 * @param string $currentLanguage
 	 */
 	public function __construct(
-		Elasticsearch $elasticsearch,
-		$active_languages
+		$elasticsearchVersion,
+		$activeLanguages,
+		$defaultLanguage,
+		$currentLanguage
 	) {
-		$this->elasticsearch    = $elasticsearch;
-		$this->active_languages = $active_languages;
+		$this->elasticsearchVersion = $elasticsearchVersion;
+		$this->activeLanguages      = $activeLanguages;
+		$this->defaultLanguage      = $defaultLanguage;
+		$this->currentLanguage      = $currentLanguage;
 	}
 
 	public function addHooks() {
-		add_filter( 'ep_post_sync_args_post_prepare_meta', [ $this, 'addLangInfo' ], 10, 2 );
+		add_filter( 'ep_post_sync_args_post_prepare_meta', [ $this, 'addLanguageInfo' ], 10, 2 );
 		add_filter( 'ep_post_mapping', [ $this, 'mapping' ] );
 	}
 
 	/**
-	 * @return string;
-	 */
-	abstract protected function getFieldSlug();
-
-	/**
-	 * @param  array $post_args
-	 * @param  int   $post_id
+	 * @param  array $postArgs
+	 * @param  int   $postId
 	 *
 	 * @return array
 	 */
-	abstract public function addLangInfo( $post_args, $post_id );
+	abstract public function addLanguageInfo( $postArgs, $postId );
 
 	/**
 	 * @param  array $mapping
@@ -54,55 +65,54 @@ abstract class Field {
 		);
 
 		// Note the assignment by reference below.
-		if ( version_compare( $this->elasticsearch->get_elasticsearch_version(), '7.0', '<' ) ) {
-			$mapping_properties = &$mapping['mappings']['post']['properties'];
+		if ( version_compare( $this->elasticsearchVersion, '7.0', '<' ) ) {
+			$mappingProperties = &$mapping['mappings']['post']['properties'];
 		} else {
-			$mapping_properties = &$mapping['mappings']['properties'];
+			$mappingProperties = &$mapping['mappings']['properties'];
 		}
 
 		// Apply the analyzer.
-		$fieldSlug                                    = $this->getFieldSlug();
-		$mapping_properties[ $fieldSlug ]['type']     = 'text';
-		$mapping_properties[ $fieldSlug ]['analyzer'] = 'post_lang_field';
+		$mappingProperties[ static::FIELD_SLUG ]['type']     = 'text';
+		$mappingProperties[ static::FIELD_SLUG ]['analyzer'] = 'post_lang_field';
 
 		return $mapping;
 	}
 
 	/**
-	 * @param  array  $post_args
-	 * @param  int    $post_id
+	 * @param  array  $postArgs
+	 * @param  int    $postId
 	 *
 	 * @return string
 	 */
-	protected function getPostLang( $post_args, $post_id ) {
-		$lang = apply_filters( 'wpml_element_language_code', null, [
-			'element_id'   => $post_id,
-			'element_type' => $post_args['post_type'],
+	protected function getPostLanguage( $postArgs, $postId ) {
+		$language = apply_filters( 'wpml_element_language_code', null, [
+			'element_id'   => $postId,
+			'element_type' => $postArgs['post_type'],
 		]);
 
-		if ( ! in_array( $lang, $this->active_languages, true ) ) {
-			$lang = 'en';
+		if ( ! in_array( $language, $this->activeLanguages, true ) ) {
+			$language = $this->defaultLanguage;
 
-			$pattern = $this->buildLangPattern();
+			$pattern = $this->buildLanguagePattern();
 			if (
-				isset( $post_args['guid'] ) &&
-				! empty( $post_args['guid'] ) &&
-				preg_match( $pattern, $post_args['guid'], $match )
+				isset( $postArgs['guid'] ) &&
+				! empty( $postArgs['guid'] ) &&
+				preg_match( $pattern, $postArgs['guid'], $match )
 			) {
-				$lang = end( $match );
+				$language = end( $match );
 			}
 		}
 
-		return $lang;
+		return $language;
 	}
 
 	/**
 	 * @return string
 	 */
-	protected function buildLangPattern() {
-		$pattern = $this->buildPatternForLangAsDirectory();
-		$pattern .= '|' . $this->buildPatternForLangAsParameter();
-		$pattern .= '|' . $this->buildPatternForLangAsSubdomain();
+	protected function buildLanguagePattern() {
+		$pattern = $this->buildPatternForLanguageAsDirectory();
+		$pattern .= '|' . $this->buildPatternForLanguageAsParameter();
+		$pattern .= '|' . $this->buildPatternForLanguageAsSubdomain();
 
 		return '/' . $pattern . '/';
 	}
@@ -110,27 +120,27 @@ abstract class Field {
 	/**
 	 * @return string
 	 */
-	protected function buildPatternForLangAsDirectory() {
-		return sprintf( '\/(%s)\/', implode( '|', $this->active_languages ) );
+	protected function buildPatternForLanguageAsDirectory() {
+		return sprintf( '\/(%s)\/', implode( '|', $this->activeLanguages ) );
 	}
 
 	/**
 	 * @return string
 	 */
-	protected function buildPatternForLangAsParameter() {
-		$lang_in_params = [];
-		foreach ( $this->active_languages as $lang ) {
-			$lang_in_params[] = 'lang=(' . $lang . ')';
+	protected function buildPatternForLanguageAsParameter() {
+		$languageInParams = [];
+		foreach ( $this->activeLanguages as $language ) {
+			$languageInParams[] = 'lang=(' . $language . ')';
 		}
 
-		return '(' . implode( '|', $lang_in_params ) . ')';
+		return '(' . implode( '|', $languageInParams ) . ')';
 	}
 
 	/**
 	 * @return string
 	 */
-	protected function buildPatternForLangAsSubdomain() {
-		return sprintf( '\/\/(%s)\.', implode( '|', $this->active_languages ) );
+	protected function buildPatternForLanguageAsSubdomain() {
+		return sprintf( '\/\/(%s)\.', implode( '|', $this->activeLanguages ) );
 	}
 
 }

@@ -1,28 +1,84 @@
 <?php
 
-
 namespace WPML\ElasticPress;
-
 
 class Plugin {
 	public static function init() {
 		add_action( 'plugins_loaded', function () {
 			if ( defined( 'EP_VERSION' ) && defined( 'ICL_SITEPRESS_VERSION' ) ) {
-				$active_languages_data = apply_filters( 'wpml_active_languages', [] );
-				$active_languages      = array_keys( $active_languages_data );
+				global $wpdb;
+
+				$activeLanguagesData  = apply_filters( 'wpml_active_languages', [] );
+				$activeLanguages      = array_keys( $activeLanguagesData );
+				$defaultLanguage      = apply_filters( 'wpml_default_language', '' );
+				$currentLanguage      = apply_filters( 'wpml_current_language', '' );
+
+				$elasticsearch        = \ElasticPress\Elasticsearch::factory();
+				$elasticsearchVersion = $elasticsearch->get_elasticsearch_version();
+				$indexables           = \ElasticPress\Indexables::factory();
+				$networkActivated     = defined( 'EP_IS_NETWORK' ) && EP_IS_NETWORK;
+
+				$indicesManager       = new Manager\Indices(
+					$elasticsearch,
+					$indexables,
+					$activeLanguages,
+					$defaultLanguage
+				);
+				$indicesManager->addHooks();
 
 				$feature = new Feature(
 					new Field\Search(
-						\ElasticPress\Elasticsearch::factory(),
-						$active_languages
+						$elasticsearchVersion,
+						$activeLanguages,
+						$defaultLanguage,
+						$currentLanguage
 					),
 					new Field\Sync(
-						\ElasticPress\Elasticsearch::factory(),
-						$active_languages
+						$elasticsearchVersion,
+						$activeLanguages,
+						$defaultLanguage,
+						$currentLanguage
 					),
-					new Sync\Dashboard(),
+					new Sync\Dashboard(
+						$wpdb,
+						$indexables,
+						$indicesManager,
+						new Manager\DashboardStatus(
+							$activeLanguages
+						),
+						$activeLanguages,
+						$defaultLanguage,
+					),
+					new Sync\Singular(
+						$indexables,
+						$indicesManager,
+						$activeLanguages,
+						$defaultLanguage
+					),
 					new Sync\CLI(
-						$active_languages
+						$wpdb,
+						$indexables,
+						$indicesManager,
+						$activeLanguages,
+						$defaultLanguage,
+					),
+					new Frontend\Search(
+						$indicesManager,
+						$currentLanguage
+					),
+					new Stats\Health(
+						$indexables,
+						$networkActivated,
+						$indicesManager,
+						$activeLanguages,
+						$defaultLanguage
+					),
+					new Stats\Report(
+						$indexables,
+						new \ElasticPress\StatusReport\Indices(),
+						$indicesManager,
+						$activeLanguages,
+						$defaultLanguage
 					)
 				);
 
@@ -32,6 +88,6 @@ class Plugin {
 					\WP_CLI::add_command( 'wpml_elasticpress', Command::class );
 				}
 			}
-		} );
+		}, 11 );
 	}
 }

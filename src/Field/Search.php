@@ -6,59 +6,51 @@ use WPML\ElasticPress\Field as Field;
 
 class Search extends Field {
 
-	/** @var string */
-	protected $fieldSlug = 'post_unique_lang';
+	const FIELD_SLUG = 'post_lang';
 
 	public function addHooks() {
 		parent::addHooks();
-		add_filter( 'ep_post_formatted_args', [ $this, 'filterByLang' ], 10, 1 );
+		add_filter( 'ep_post_formatted_args', [ $this, 'filterByLanguage' ], 10, 1 );
 	}
 
 	/**
-	 * @return string;
-	 */
-	protected function getFieldSlug() {
-		return $this->fieldSlug;
-	}
-
-	/**
-	 * @param  array  $post_args
-	 * @param  int  $post_id
+	 * @param  array  $postArgs
+	 * @param  int    $postId
 	 *
 	 * @return array
 	 */
-	public function addLangInfo( $post_args, $post_id ) {
-		if ( apply_filters( 'wpml_is_display_as_translated_post_type', false, $post_args['post_type'] ) ) {
-			$post_args['post_lang'] = $this->getPostLangAsTranslated( $post_args, $post_id );
-		} else {
-			$post_args['post_lang'] = $this->getPostLang( $post_args, $post_id );
+	public function addLanguageInfo( $postArgs, $postId ) {
+		if ( apply_filters( 'wpml_is_display_as_translated_post_type', false, $postArgs['post_type'] ) ) {
+			$postArgs[ static::FIELD_SLUG ] = $this->getPostLanguageAsTranslated( $postArgs, $postId );
+			return $postArgs;
 		}
 
-		return $post_args;
+		$postArgs[ static::FIELD_SLUG ] = $this->getPostLanguage( $postArgs, $postId );
+		return $postArgs;
 	}
 
 	/**
-	 * @param  array  $post_args
-	 * @param  int  $post_id
+	 * @param  array  $postArgs
+	 * @param  int    $postId
 	 *
 	 * @return string
 	 */
-	private function getPostLangAsTranslated( $post_args, $post_id ) {
-		$active_languages = $this->active_languages;
-		$element_type     = apply_filters( 'wpml_element_type', $post_args['post_type'] );
-		$trid             = apply_filters( 'wpml_element_trid', null, $post_id, $element_type );
-		$translations     = apply_filters( 'wpml_get_element_translations', null, $trid, $element_type );
-		foreach ( $active_languages as $key => $language ) {
-			if ( array_key_exists( $language, $translations ) && $translations[ $language ]->element_id != $post_id ) {
-				unset( $active_languages[ $key ] );
+	private function getPostLanguageAsTranslated( $postArgs, $postId ) {
+		$activeLanguages = $this->activeLanguages;
+		$elementType     = apply_filters( 'wpml_element_type', $postArgs['post_type'] );
+		$trid            = apply_filters( 'wpml_element_trid', null, $postId, $elementType );
+		$translations    = apply_filters( 'wpml_get_element_translations', null, $trid, $elementType );
+		foreach ( $activeLanguages as $key => $language ) {
+			if ( array_key_exists( $language, $translations ) && $translations[ $language ]->element_id != $postId ) {
+				unset( $activeLanguages[ $key ] );
 			}
 		}
 
-		if ( empty( $active_languages ) ) {
-			return $this->getPostLang( $post_args, $post_id );
+		if ( empty( $activeLanguages ) ) {
+			return $this->getPostLanguage( $postArgs, $postId );
 		}
 
-		return implode( ',', $active_languages );
+		return implode( ',', $activeLanguages );
 	}
 
 	/**
@@ -66,10 +58,10 @@ class Search extends Field {
 	 *
 	 * @return array
 	 */
-	public function filterByLang( $args ) {
+	public function filterByLanguage( $args ) {
 		$args['post_filter']['bool']['must'][] = [
 			'term' => [
-				'post_lang' => $this->getQueryLang(),
+				'post_lang' => $this->getQueryLanguage(),
 			],
 		];
 
@@ -79,12 +71,15 @@ class Search extends Field {
 	/**
 	 * @return string|null
 	 */
-	private function getQueryLang() {
-		$lang = apply_filters( 'wpml_current_language', null );
-		if ( isset( $_GET['lang'] ) ) {
-			if ( in_array( $_GET['lang'], $this->active_languages, true ) ) {
-				$lang = $_GET['lang'];
-			}
+	private function getQueryLanguage() {
+		$lang = $this->currentLanguage;
+
+		if (
+			isset( $_GET['lang'] )
+			&& is_string( $_GET['lang'] )
+			&& in_array( $_GET['lang'], $this->activeLanguages, true )
+		) {
+			$lang = $_GET['lang'];
 		}
 
 		return $lang;

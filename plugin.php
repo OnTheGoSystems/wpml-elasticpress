@@ -19,6 +19,10 @@ if ( ! defined( 'EP_VERSION' ) || version_compare( EP_VERSION, '3.0.0', '<' ) ) 
 	return;
 }
 
+if ( ! defined( 'ICL_SITEPRESS_VERSION' ) ) {
+	return;
+}
+
 define( 'WPMLELASTICPRESS_VERSION', '1.0.0' );
 define( 'WPMLELASTICPRESS_PLUGIN_PATH', dirname( __FILE__ ) );
 

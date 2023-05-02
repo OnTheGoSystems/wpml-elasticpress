@@ -37,7 +37,7 @@ class LanguageSearchTest extends \OTGS_TestCase {
 			$translation_element_factory,
 			$sitepress
 		);
-		$result  = $subject->addLangInfo( $post_args, $post_id );
+		$result  = $subject->addLanguageInfo( $post_args, $post_id );
 
 		$this->assertEquals( $expected_result, $result );
 	}
@@ -62,7 +62,7 @@ class LanguageSearchTest extends \OTGS_TestCase {
 		$sitepress->method( 'is_display_as_translated_post_type' )->willReturn( false );
 
 		$subject = new LanguageSearch( $translation_element_factory, $sitepress );
-		$result  = $subject->addLangInfo( $post_args, $post_id );
+		$result  = $subject->addLanguageInfo( $post_args, $post_id );
 
 		$this->assertEquals( $expected_result, $result );
 	}
@@ -93,7 +93,7 @@ class LanguageSearchTest extends \OTGS_TestCase {
 			$translation_element_factory,
 			$sitepress
 		);
-		$result  = $subject->addLangInfo( $post_args, $post_id );
+		$result  = $subject->addLanguageInfo( $post_args, $post_id );
 
 		$this->assertEquals( $expected_result, $result );
 	}
@@ -156,7 +156,7 @@ class LanguageSearchTest extends \OTGS_TestCase {
 			$translation_element_factory,
 			$sitepress
 		);
-		$result  = $subject->addLangInfo( $post_args, $post_id );
+		$result  = $subject->addLanguageInfo( $post_args, $post_id );
 
 		$this->assertEquals( $expected_result, $result );
 	}
@@ -185,7 +185,7 @@ class LanguageSearchTest extends \OTGS_TestCase {
 			$translation_element_factory,
 			$sitepress
 		);
-		$result  = $subject->addLangInfo( $post_args, $post_id );
+		$result  = $subject->addLanguageInfo( $post_args, $post_id );
 
 		$this->assertEquals( $expected_result, $result );
 	}
@@ -203,7 +203,7 @@ class LanguageSearchTest extends \OTGS_TestCase {
 		$expected_result = [ 'post_filter' => [ 'bool' => [ 'must' => [ [ 'term' => [ 'post_lang' => $lang ] ] ] ] ] ];
 
 		$subject = new LanguageSearch( $this->get_element_factory(), $sitepress );
-		$this->assertEquals( $expected_result, $subject->filterByLang( $args ) );
+		$this->assertEquals( $expected_result, $subject->filterByLanguage( $args ) );
 	}
 
 	/**
@@ -219,7 +219,7 @@ class LanguageSearchTest extends \OTGS_TestCase {
 		$expected_result = [ 'post_filter' => [ 'bool' => [ 'must' => [ [ 'term' => [ 'post_lang' => 'en' ] ] ] ] ] ];
 
 		$subject = new LanguageSearch( $this->get_element_factory(), $sitepress );
-		$this->assertEquals( $expected_result, $subject->filterByLang( $args ) );
+		$this->assertEquals( $expected_result, $subject->filterByLanguage( $args ) );
 	}
 
 	/**
@@ -235,7 +235,7 @@ class LanguageSearchTest extends \OTGS_TestCase {
 		$expected_result = [ 'post_filter' => [ 'bool' => [ 'must' => [ [ 'term' => [ 'post_lang' => $_GET['lang'] ] ] ] ] ] ];
 
 		$subject = new LanguageSearch( $this->get_element_factory(), $sitepress );
-		$this->assertEquals( $expected_result, $subject->filterByLang( $args ) );
+		$this->assertEquals( $expected_result, $subject->filterByLanguage( $args ) );
 	}
 
 	private function get_sitepress() {
