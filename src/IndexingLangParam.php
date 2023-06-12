@@ -107,6 +107,12 @@ class IndexingLangParam {
 		// Apply the analyzer.
 		$mapping_properties['post_lang']['type']     = 'text';
 		$mapping_properties['post_lang']['analyzer'] = 'post_lang_field';
+		$mapping_properties['post_lang']['fields'] = array(
+			'keyword' => array(
+				'type' => 'keyword',
+				'ignore_above' => '256',
+			)
+		);
 
 		return $mapping;
 	}
