@@ -91,10 +91,14 @@ class IndexingLangParam {
 	 */
 	public function mapping( $mapping ) {
 		// Define an analyzer with no filters (no stopwords).
-		$mapping['settings']['analysis']['analyzer']['post_lang_field'] = array(
+		$mapping['settings']['analysis']['analyzer']['post_lang_field']      = array(
 			'type'      => 'custom',
-			'tokenizer' => 'standard',
+			'tokenizer' => 'post_lang_tokenizer',
 			'filter'    => [],
+		);
+		$mapping['settings']['analysis']['tokenizer']['post_lang_tokenizer'] = array(
+			'type'              => 'char_group',
+			'tokenize_on_chars' => [ ',' ],
 		);
 
 		// Note the assignment by reference below.
