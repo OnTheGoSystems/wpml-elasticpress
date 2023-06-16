@@ -82,8 +82,14 @@ class IndexingLangParamTest extends \OTGS_TestCase {
 					'analyzer' => [
 						'post_lang_field' => [
 							'type'      => 'custom',
-							'tokenizer' => 'standard',
+							'tokenizer' => 'post_lang_tokenizer',
 							'filter'    => [],
+						],
+					],
+					'tokenizer' => [
+						'post_lang_tokenizer' => [
+							'type'              => 'char_group',
+							'tokenize_on_chars' => [ ',' ],
 						],
 					],
 				],
@@ -132,8 +138,14 @@ class IndexingLangParamTest extends \OTGS_TestCase {
 					'analyzer' => [
 						'post_lang_field' => [
 							'type'      => 'custom',
-							'tokenizer' => 'standard',
+							'tokenizer' => 'post_lang_tokenizer',
 							'filter'    => [],
+						],
+					],
+					'tokenizer' => [
+						'post_lang_tokenizer' => [
+							'type'              => 'char_group',
+							'tokenize_on_chars' => [ ',' ],
 						],
 					],
 				],
