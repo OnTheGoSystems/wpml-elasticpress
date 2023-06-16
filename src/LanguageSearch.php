@@ -80,6 +80,13 @@ class LanguageSearch {
 	}
 
 	private function getPostLangAsTranslated( $post_args, $post_id ) {
+		$post_element = $this->element_factory->create( $post_id, 'post' );
+		$lang         = $post_element->get_language_code();
+
+		if ( $lang !== $this->sitepress->get_default_language() ) {
+			return $this->getPostLang( $post_args, $post_id );
+		}
+
 		$active_languages = array_keys( $this->sitepress->get_active_languages() );
 		$element_type     = apply_filters( 'wpml_element_type', $post_args['post_type'] );
 		$trid             = apply_filters( 'wpml_element_trid', null, $post_id, $element_type );
