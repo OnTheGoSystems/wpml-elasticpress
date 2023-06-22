@@ -20,12 +20,19 @@ class Search extends Field {
 	 * @return array
 	 */
 	public function addLanguageInfo( $postArgs, $postId ) {
-		if ( apply_filters( 'wpml_is_display_as_translated_post_type', false, $postArgs['post_type'] ) ) {
-			$postArgs[ static::FIELD_SLUG ] = $this->getPostLanguageAsTranslated( $postArgs, $postId );
+		$postLanguage = $this->getPostLanguage( $postArgs, $postId );
+
+		if ( $postLanguage !== $this->defaultLanguage ) {
+			$postArgs[ static::FIELD_SLUG ] = $postLanguage;
 			return $postArgs;
 		}
 
-		$postArgs[ static::FIELD_SLUG ] = $this->getPostLanguage( $postArgs, $postId );
+		if ( apply_filters( 'wpml_is_display_as_translated_post_type', false, $postArgs['post_type'] ) ) {
+			$postArgs[ static::FIELD_SLUG ] = $this->getPostLanguageAsTranslated( $postArgs, $postId, $postLanguage );
+			return $postArgs;
+		}
+
+		$postArgs[ static::FIELD_SLUG ] = $postLanguage;
 		return $postArgs;
 	}
 
@@ -35,19 +42,26 @@ class Search extends Field {
 	 *
 	 * @return string
 	 */
-	private function getPostLanguageAsTranslated( $postArgs, $postId ) {
+	private function getPostLanguageAsTranslated( $postArgs, $postId, $postLanguage ) {
+		if ( $postLanguage !== $this->defaultLanguage ) {
+			return $postLanguage;
+		}
+
 		$activeLanguages = $this->activeLanguages;
 		$elementType     = apply_filters( 'wpml_element_type', $postArgs['post_type'] );
 		$trid            = apply_filters( 'wpml_element_trid', null, $postId, $elementType );
 		$translations    = apply_filters( 'wpml_get_element_translations', null, $trid, $elementType );
 		foreach ( $activeLanguages as $key => $language ) {
-			if ( array_key_exists( $language, $translations ) && $translations[ $language ]->element_id != $postId ) {
+			if (
+				array_key_exists( $language, $translations )
+				&& $translations[ $language ]->element_id != $postId
+			) {
 				unset( $activeLanguages[ $key ] );
 			}
 		}
 
 		if ( empty( $activeLanguages ) ) {
-			return $this->getPostLanguage( $postArgs, $postId );
+			return $postLanguage;
 		}
 
 		return implode( ',', $activeLanguages );
