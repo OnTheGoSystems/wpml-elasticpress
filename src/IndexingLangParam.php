@@ -97,8 +97,8 @@ class IndexingLangParam {
 			'filter'    => [],
 		);
 		$mapping['settings']['analysis']['tokenizer']['post_lang_tokenizer'] = array(
-			'type'              => 'char_group',
-			'tokenize_on_chars' => [ ',' ],
+			'type'    => 'pattern',
+			'pattern' => ',',
 		);
 
 		// Note the assignment by reference below.
