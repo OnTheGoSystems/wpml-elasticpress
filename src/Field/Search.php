@@ -8,9 +8,22 @@ class Search extends Field {
 
 	const FIELD_SLUG = 'post_lang';
 
+	/** @var null|array */
+	private $translatablePostTypes = null;
+
 	public function addHooks() {
 		parent::addHooks();
 		add_filter( 'ep_post_formatted_args', [ $this, 'filterByLanguage' ], 10, 1 );
+	}
+
+	/**
+	 * @return array
+	 */
+	private function getTranslatablePostTypes() {
+		if ( null === $this->translatablePostTypes ) {
+			$this->translatablePostTypes = array_keys( apply_filters( 'wpml_translatable_documents', [] ) );
+		}
+		return $this->translatablePostTypes;
 	}
 
 	/**
@@ -22,11 +35,19 @@ class Search extends Field {
 	public function addLanguageInfo( $postArgs, $postId ) {
 		$postLanguage = $this->getPostLanguage( $postArgs, $postId );
 
+		// Items in non-default languages have their own language
 		if ( $postLanguage !== $this->defaultLanguage ) {
 			$postArgs[ static::FIELD_SLUG ] = $postLanguage;
 			return $postArgs;
 		}
 
+		// Non-translatable types should appear in all languages
+		if ( ! in_array( $postArgs['post_type'], $this->getTranslatablePostTypes, true ) ) {
+			$postArgs[ static::FIELD_SLUG ] = implode( ',', $this->activeLanguages );
+			return $postArgs;
+		}
+
+		// Display-as-translated types in default languages should include all untranslated languages
 		if ( apply_filters( 'wpml_is_display_as_translated_post_type', false, $postArgs['post_type'] ) ) {
 			$postArgs[ static::FIELD_SLUG ] = $this->getPostLanguageAsTranslated( $postArgs, $postId, $postLanguage );
 			return $postArgs;

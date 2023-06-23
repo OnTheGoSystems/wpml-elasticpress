@@ -6,8 +6,6 @@ class Plugin {
 	public static function init() {
 		add_action( 'plugins_loaded', function () {
 			if ( defined( 'EP_VERSION' ) && defined( 'ICL_SITEPRESS_VERSION' ) ) {
-				global $wpdb;
-
 				$activeLanguagesData  = apply_filters( 'wpml_active_languages', [] );
 				$activeLanguages      = array_keys( $activeLanguagesData );
 				$defaultLanguage      = apply_filters( 'wpml_default_language', '' );
@@ -16,6 +14,7 @@ class Plugin {
 				$elasticsearch        = \ElasticPress\Elasticsearch::factory();
 				$elasticsearchVersion = $elasticsearch->get_elasticsearch_version();
 				$indexables           = \ElasticPress\Indexables::factory();
+				$features             = \ElasticPress\Features::factory();
 				$networkActivated     = defined( 'EP_IS_NETWORK' ) && EP_IS_NETWORK;
 
 				$indicesManager       = new Manager\Indices(
@@ -40,7 +39,6 @@ class Plugin {
 						$currentLanguage
 					),
 					new Sync\Dashboard(
-						$wpdb,
 						$indexables,
 						$indicesManager,
 						new Manager\DashboardStatus(
@@ -56,13 +54,18 @@ class Plugin {
 						$defaultLanguage
 					),
 					new Sync\CLI(
-						$wpdb,
 						$indexables,
 						$indicesManager,
 						$activeLanguages,
 						$defaultLanguage,
 					),
-					new Frontend\Search(
+					new FeatureSupport\Search(
+						$features,
+						$indicesManager,
+						$currentLanguage
+					),
+					new FeatureSupport\RelatedPosts(
+						$features,
 						$indicesManager,
 						$currentLanguage
 					),

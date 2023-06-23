@@ -7,17 +7,10 @@ use ElasticPress\Indexables;
 use WPML\ElasticPress\Manager\Indices;
 
 use WPML\ElasticPress\Traits\ManageIndexables;
-use WPML\ElasticPress\Traits\PostCount;
-use WPML\ElasticPress\Traits\QueryFilters;
 
 class CLI {
 
 	use ManageIndexables;
-	use PostCount;
-	use QueryFilters;
-
-	/** @var \wpdb */
-	private $wpdb;
 
 	/** @var Indexables */
 	private $indexables;
@@ -31,24 +24,18 @@ class CLI {
 	/** @var string */
 	private $defaultLanguage;
 
-	/** @var string */
-	private $currentLanguage = '';
-
 	/**
-	 * @param \wpdb      $wpdb
 	 * @param Indexables $indexables
 	 * @param Indices    $indicesManager
 	 * @param array      $activeLanguages
 	 * @param string     $defaultLanguage
 	 */
 	public function __construct(
-		\wpdb        $wpdb,
 		Indexables   $indexables,
 		Indices      $indicesManager,
 		$activeLanguages,
 		$defaultLanguage
 	) {
-		$this->wpdb                  = $wpdb;
 		$this->indexables            = $indexables;
 		$this->indicesManager        = $indicesManager;
 		$this->activeLanguages       = $activeLanguages;
@@ -59,7 +46,6 @@ class CLI {
 		add_action( 'wpml_ep_regenerate_indices', [ $this, 'regenerateIndices' ] );
 		add_action( 'wpml_ep_check_indices', [ $this, 'checkIndices' ] );
 		add_action( 'ep_wp_cli_pre_index', [ $this, 'setUp' ], 10, 2 );
-		add_filter( 'ep_cli_index_args', [ $this, 'setQueryArgs' ] );
 		add_action( 'ep_wp_cli_after_index', [ $this, 'tearDown' ], 10, 2 );
 	}
 
@@ -78,8 +64,7 @@ class CLI {
 	 */
 	public function setUp( $args, $assocArgs ) {
 		$this->setCurrentLanguage( $assocArgs );
-		$this->setCache( $assocArgs );
-		$this->setQueryFilters();
+		$this->clearCache( $assocArgs );
 		$this->deactivateIndexables();
 	}
 
@@ -92,9 +77,8 @@ class CLI {
 	 * @param array $assocArgs
 	 */
 	public function tearDown( $args, $assocArgs ) {
-		$this->indicesManager->clearCurrentIndexLanguage();
+		$this->clearCurrentLanguage();
 		$this->clearCache( $assocArgs );
-		$this->clearQueryFilters();
 		$this->reactivateIndexables();
 	}
 
@@ -102,16 +86,41 @@ class CLI {
 	 * @param array $assocArgs
 	 */
 	private function setCurrentLanguage( $assocArgs ) {
-		$this->currentLanguage = $this->defaultLanguage;
+		$currentLanguage = $this->defaultLanguage;
 
 		if ( isset( $assocArgs['post-lang'] ) ) {
 			$language = $assocArgs['post-lang'];
 			if ( in_array( $language, $this->activeLanguages, true ) ) {
-				$this->currentLanguage = $language;
+				$currentLanguage = $language;
 			}
 		}
 
-		$this->indicesManager->setCurrentIndexLanguage( $this->currentLanguage );
+		do_action( 'wpml_switch_language', $currentLanguage );
+		$this->indicesManager->setCurrentIndexLanguage( $currentLanguage );
+	}
+
+	private function clearCurrentLanguage() {
+		do_action( 'wpml_switch_language', null );
+		$this->indicesManager->clearCurrentIndexLanguage();
+	}
+
+	/**
+	 * @param array $assocArgs
+	 */
+	private function clearCache( $queryArgs ) {
+		// Elasticpress caches item counters during sync to know synced and remaining counts
+		// TODO We might want to generate our own during setUp instead of deleting it
+		if ( ! isset( $queryArgs['post-type'] ) ) {
+			return;
+		}
+
+		$postTypes = explode( ',', $queryArgs['post-type'] );
+		$postTypes = array_map( 'trim', $postTypes );
+
+		foreach ( $postTypes as $postType ) {
+			$cacheKey = 'posts-' . $postType;
+			wp_cache_delete( $cacheKey, 'counts' );
+		}
 	}
 
 }

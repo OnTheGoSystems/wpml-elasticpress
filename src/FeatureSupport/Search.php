@@ -1,34 +1,20 @@
 <?php
 
-namespace WPML\ElasticPress\Frontend;
+namespace WPML\ElasticPress\FeatureSupport;
 
-use WPML\ElasticPress\Manager\Indices;
+use ElasticPress\Features;
 
-class Search {
+use WPML\ElasticPress\FeatureSupport;
 
-	/** @var Indices */
-	private $indicesManager;
+class Search extends FeatureSupport {
 
-	/** @var string */
-	private $defaultLanguage;
-
-	/** @var string */
-	private $currentLanguage = '';
-
-	/**
-	 * @param Indices $indicesManager
-	 * @param string  $defaultLanguage
-	 * @param string  $currentLanguage
-	 */
-	public function __construct(
-		Indices $indicesManager,
-		$currentLanguage
-	) {
-		$this->indicesManager  = $indicesManager;
-		$this->currentLanguage = $currentLanguage;
-	}
+	const FEATURE_SLUG = 'search';
 
 	public function addHooks() {
+		if ( ! $this->isFeatureActive() ) {
+			return;
+		}
+
 		add_filter( 'ep_wp_query_cached_posts', [ $this, 'useIndexByLanguage' ], 999, 1 );
 		add_action( 'ep_wp_query_search', [ $this, 'restoreIndexLanguage' ], 999 );
 	}

@@ -19,8 +19,11 @@ class Feature extends \ElasticPress\Feature {
 	/** @var Sync\CLI */
 	private $syncCli;
 
-	/** @var Frontend\Search */
+	/** @var FeatureSupport\Search */
 	private $frontendSearch;
+
+	/** @var FeatureSupport\RelatedPosts */
+	private $frontendRelatedPosts;
 
 	/** @var Stats\Health */
 	private $statsHealth;
@@ -29,33 +32,36 @@ class Feature extends \ElasticPress\Feature {
 	private $statsReport;
 
 	/**
-	 * @param Field\Search    $fieldSearch
-	 * @param Field\Sync      $fieldSync
-	 * @param Sync\Dashboard  $syncDashboard
-	 * @param Sync\singular   $syncSingular
-	 * @param Sync\CLI        $syncCli
-	 * @param Frontend\Search $frontendSearch
-	 * @param Stats\Health    $statsHealth
-	 * @param Stats\Report    $statsHealth
+	 * @param Field\Search                $fieldSearch
+	 * @param Field\Sync                  $fieldSync
+	 * @param Sync\Dashboard              $syncDashboard
+	 * @param Sync\singular               $syncSingular
+	 * @param Sync\CLI                    $syncCli
+	 * @param FeatureSupport\Search       $frontendSearch
+	 * @param FeatureSupport\RelatedPosts $frontendRelatedPosts
+	 * @param Stats\Health                $statsHealth
+	 * @param Stats\Report                $statsHealth
 	 */
 	public function __construct(
-		Field\Search    $fieldSearch,
-		Field\Sync      $fieldSync,
-		Sync\Dashboard  $syncDashboard,
-		Sync\Singular   $syncSingular,
-		Sync\CLI        $syncCli,
-		Frontend\Search $frontendSearch,
-		Stats\Health    $statsHealth,
-		Stats\Report    $statsReport
+		Field\Search                $fieldSearch,
+		Field\Sync                  $fieldSync,
+		Sync\Dashboard              $syncDashboard,
+		Sync\Singular               $syncSingular,
+		Sync\CLI                    $syncCli,
+		FeatureSupport\Search       $frontendSearch,
+		FeatureSupport\RelatedPosts $frontendRelatedPosts,
+		Stats\Health                $statsHealth,
+		Stats\Report                $statsReport
 	) {
-		$this->fieldSearch    = $fieldSearch;
-		$this->fieldSync      = $fieldSync;
-		$this->syncDashboard  = $syncDashboard;
-		$this->syncSingular   = $syncSingular;
-		$this->syncCli        = $syncCli;
-		$this->frontendSearch = $frontendSearch;
-		$this->statsHealth    = $statsHealth;
-		$this->statsReport    = $statsReport;
+		$this->fieldSearch          = $fieldSearch;
+		$this->fieldSync            = $fieldSync;
+		$this->syncDashboard        = $syncDashboard;
+		$this->syncSingular         = $syncSingular;
+		$this->syncCli              = $syncCli;
+		$this->frontendSearch       = $frontendSearch;
+		$this->frontendRelatedPosts = $frontendRelatedPosts;
+		$this->statsHealth          = $statsHealth;
+		$this->statsReport          = $statsReport;
 
 		$this->slug                     = 'wpml';
 		$this->title                    = esc_html__( 'WPML integration', 'sitepress' );
@@ -71,6 +77,7 @@ class Feature extends \ElasticPress\Feature {
 		$this->syncSingular->addHooks();
 		$this->syncCli->addHooks();
 		$this->frontendSearch->addHooks();
+		$this->frontendRelatedPosts->addHooks();
 		$this->statsHealth->addHooks();
 		$this->statsReport->addHooks();
 	}

@@ -10,15 +10,10 @@ use WPML\ElasticPress\Manager\Indices;
 use WPML\ElasticPress\Manager\DashboardStatus;
 
 use WPML\ElasticPress\Traits\ManageIndexables;
-use WPML\ElasticPress\Traits\QueryFilters;
 
 class Dashboard {
 
 	use ManageIndexables;
-	use QueryFilters;
-
-	/** @var \wpdb */
-	private $wpdb;
 
 	/** @var Indexables */
 	private $indexables;
@@ -39,7 +34,6 @@ class Dashboard {
 	private $currentLanguage = '';
 
 	/**
-	 * @param \wpdb           $wpdb
 	 * @param Indexables      $indexables
 	 * @param Indices         $indicesManager
 	 * @param DashboardStatus $status
@@ -47,14 +41,12 @@ class Dashboard {
 	 * @param string          $defaultLanguage
 	 */
 	public function __construct(
-		\wpdb           $wpdb,
 		Indexables      $indexables,
 		Indices         $indicesManager,
 		DashboardStatus $status,
 		$activeLanguages,
 		$defaultLanguage
 	) {
-		$this->wpdb                  = $wpdb;
 		$this->indexables            = $indexables;
 		$this->indicesManager        = $indicesManager;
 		$this->status                = $status;
@@ -68,7 +60,6 @@ class Dashboard {
 		}
 
 		add_action( 'wp_ajax_ep_index', [ $this, 'action_wp_ajax_ep_index' ], 9 );
-		//add_filter( 'ep_dashboard_index_args', [ $this, 'setQueryArgs' ] );
 		add_action( 'wp_ajax_ep_cancel_index', [ $this, 'action_wp_ajax_ep_cancel_index' ], 9 );
 	}
 
@@ -79,6 +70,16 @@ class Dashboard {
 	private function tearDown() {
 		$this->indicesManager->clearCurrentIndexLanguage();
 		$this->status->delete();
+	}
+
+	private function setCurrentLanguage() {
+		do_action( 'wpml_switch_language', $this->currentLanguage );
+		$this->indicesManager->setCurrentIndexLanguage( $this->currentLanguage );
+	}
+
+	private function clearCurrentLanguage() {
+		do_action( 'wpml_switch_language', null );
+		$this->indicesManager->clearCurrentIndexLanguage();
 	}
 
 	private function isDashboardSync() {
@@ -111,8 +112,7 @@ class Dashboard {
 
 	private function beforeFullIndex() {
 		$this->currentLanguage = $this->status->get('currentLanguage');
-		$this->indicesManager->setCurrentIndexLanguage( $this->currentLanguage );
-		$this->setQueryFilters();
+		$this->setCurrentLanguage();
 		$this->status->logIndexablesToReset( $this->deactivateIndexables() );
 	}
 
@@ -134,6 +134,9 @@ class Dashboard {
 		}
 		$this->maybePutMapping();
 		$this->beforeFullIndex();
+
+		// This happens on an AJAX call, hence on admin: force the display-as-translated snippet in queries
+		add_filter( 'wpml_should_use_display_as_translated_snippet', '__return_true' );
 
 		IndexHelper::factory()->full_index(
 			[
@@ -159,7 +162,7 @@ class Dashboard {
 	}
 
 	private function markLanguageAsComplete() {
-		$this->indicesManager->clearCurrentIndexLanguage();
+		$this->clearCurrentLanguage();
 		$this->reactivateIndexables( $this->status->get('indexablesToReset') );
 		$this->status->resetForNextLanguage();
 	}
