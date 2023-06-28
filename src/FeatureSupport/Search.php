@@ -4,6 +4,7 @@ namespace WPML\ElasticPress\FeatureSupport;
 
 use ElasticPress\Features;
 
+use WPML\ElasticPress\Constants;
 use WPML\ElasticPress\FeatureSupport;
 
 class Search extends FeatureSupport {
@@ -15,8 +16,8 @@ class Search extends FeatureSupport {
 			return;
 		}
 
-		add_filter( 'ep_wp_query_cached_posts', [ $this, 'useIndexByLanguage' ], 999, 1 );
-		add_action( 'ep_wp_query_search', [ $this, 'restoreIndexLanguage' ], 999 );
+		add_filter( 'ep_wp_query_cached_posts', [ $this, 'useIndexByLanguage' ], Constants::LATE_HOOK_PRIORITY, 1 );
+		add_action( 'ep_wp_query_search', [ $this, 'restoreIndexLanguage' ], Constants::LATE_HOOK_PRIORITY );
 	}
 
 	/**

@@ -47,6 +47,14 @@ class Indices {
 
 	public function addHooks() {
 		add_filter( 'ep_index_name', [ $this, 'filterIndexName' ], 10, 1 );
+		add_filter( 'ep_global_alias', [ $this, 'filterIndexName' ], 10, 1 );
+
+		add_action( 'wp_initialize_site', [ $this, 'createBlogIndices' ], \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY, 1 );
+		add_action( 'delete_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY, 1 );
+		add_action( 'make_delete_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY, 1 );
+		add_action( 'make_spam_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY, 1 );
+		add_action( 'archive_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY, 1 );
+		add_action( 'deactivate_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY, 1 );
 	}
 
 	/**
@@ -76,11 +84,18 @@ class Indices {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function indexExists( $indexName ) {
+		return $this->elasticsearch->index_exists( $indexName );
+	}
+
+	/**
 	 * @param Indexable $indexable
 	 */
 	public function generateIndexByIndexable( $indexable ) {
 		$indexName = $indexable->get_index_name();
-		if ( $this->elasticsearch->index_exists( $indexName ) ) {
+		if ( $this->indexExists( $indexName ) ) {
 			return;
 		}
 		$mapping = $indexable->generate_mapping();
@@ -139,6 +154,40 @@ class Indices {
 		foreach ( $this->activeLanguages as $language ) {
 			$this->setCurrentIndexLanguage( $language );
 			$this->generateIndexableIndexes( $indexables );
+			$this->clearCurrentIndexLanguage();
+		}
+	}
+
+	/**
+	 * @param \WP_Site $blog
+	 */
+	public function createBlogIndices( $blog ) {
+		$syncManager = $this->indexables->get( \WPML\ElasticPress\Constants::INDEXABLE_SLUG_POST )->sync_manager;
+		foreach ( $this->activeLanguages as $language ) {
+			$this->setCurrentIndexLanguage( $language );
+			$syncManager->action_create_blog_index( $blog );
+			$this->clearCurrentIndexLanguage();
+		}
+	}
+
+	/**
+	 * @param int $blogId
+	 */
+	public function deleteBlogIndices( $blogId ) {
+		$indexables = $this->indexables->get_all();
+		foreach ( $indexables as $indexable ) {
+			$this->deleteBlogLanguageIndices( $blogId, $indexable );
+		}
+	}
+
+	/**
+	 * @param int                     $blogId
+	 * @param \ElasticPress\Indexable $indexable
+	 */
+	private function deleteBlogLanguageIndices( $blogId, $indexable ) {
+		foreach ( $this->activeLanguages as $language ) {
+			$this->setCurrentIndexLanguage( $language );
+			$indexable->sync_manager->action_delete_blog_from_index( $blogId );
 			$this->clearCurrentIndexLanguage();
 		}
 	}

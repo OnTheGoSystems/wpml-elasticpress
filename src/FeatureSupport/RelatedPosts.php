@@ -4,6 +4,7 @@ namespace WPML\ElasticPress\FeatureSupport;
 
 use ElasticPress\Features;
 
+use WPML\ElasticPress\Constants;
 use WPML\ElasticPress\FeatureSupport;
 use WPML\ElasticPress\Manager\Indices;
 
@@ -16,7 +17,7 @@ class RelatedPosts extends FeatureSupport {
 			return;
 		}
 
-		add_filter( 'ep_find_related_args', [ $this, 'useIndexByLanguage' ], 999, 1 );
+		add_filter( 'ep_find_related_args', [ $this, 'useIndexByLanguage' ], Constants::LATE_HOOK_PRIORITY, 1 );
 	}
 
 	/**

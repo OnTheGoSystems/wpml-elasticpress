@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: WPML ElasticPress Integration
+ * Plugin Name: WPML ElasticPress
  * Plugin URI:
- * Description: It adds support for languages in ElasticPress searching query. Results contain only posts from a current language.
+ * Description: Add full WPML support for ElasticPress.
  * Author: OnTheGoSystems
  * Author URI: http://www.onthegosystems.com/
  * Version: 1.0.0

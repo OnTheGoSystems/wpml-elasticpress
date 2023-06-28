@@ -16,4 +16,9 @@ class Constants {
 
 	const DASHBOARD_INDEX_STATUS = 'wpml_ep_dashboard_index_status';
 
+	// TODO Decide if this is -1 or 5 based on whether our logic runs nicely on delete_post
+	// based on what WPML does with translations for deleting posts
+	const EARLY_HOOK_PRIORITY = -1;
+	const LATE_HOOK_PRIORITY  = 1999;
+
 }

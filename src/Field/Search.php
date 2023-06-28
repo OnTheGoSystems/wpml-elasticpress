@@ -4,26 +4,17 @@ namespace WPML\ElasticPress\Field;
 
 use WPML\ElasticPress\Field as Field;
 
+use WPML\ElasticPress\Traits\TranslationModes;
+
 class Search extends Field {
 
-	const FIELD_SLUG = 'post_lang';
+	use TranslationModes;
 
-	/** @var null|array */
-	private $translatablePostTypes = null;
+	const FIELD_SLUG = 'post_lang';
 
 	public function addHooks() {
 		parent::addHooks();
 		add_filter( 'ep_post_formatted_args', [ $this, 'filterByLanguage' ], 10, 1 );
-	}
-
-	/**
-	 * @return array
-	 */
-	private function getTranslatablePostTypes() {
-		if ( null === $this->translatablePostTypes ) {
-			$this->translatablePostTypes = array_keys( apply_filters( 'wpml_translatable_documents', [] ) );
-		}
-		return $this->translatablePostTypes;
 	}
 
 	/**
@@ -42,50 +33,20 @@ class Search extends Field {
 		}
 
 		// Non-translatable types should appear in all languages
-		if ( ! in_array( $postArgs['post_type'], $this->getTranslatablePostTypes, true ) ) {
+		if ( $this->isNotTranslatable( $postArgs['post_type'] ) ) {
 			$postArgs[ static::FIELD_SLUG ] = implode( ',', $this->activeLanguages );
 			return $postArgs;
 		}
 
 		// Display-as-translated types in default languages should include all untranslated languages
-		if ( apply_filters( 'wpml_is_display_as_translated_post_type', false, $postArgs['post_type'] ) ) {
-			$postArgs[ static::FIELD_SLUG ] = $this->getPostLanguageAsTranslated( $postArgs, $postId, $postLanguage );
+		if ( $this->isDisplayAsTranslated( $postArgs['post_type'] ) ) {
+			$displayAsTranslatedLanguages = $this->getDisplayAsTranslatedLanguages( $postId, $postArgs['post_type'], $postLanguage );
+			$postArgs[ static::FIELD_SLUG ] = implode( ',', $displayAsTranslatedLanguages );
 			return $postArgs;
 		}
 
 		$postArgs[ static::FIELD_SLUG ] = $postLanguage;
 		return $postArgs;
-	}
-
-	/**
-	 * @param  array  $postArgs
-	 * @param  int    $postId
-	 *
-	 * @return string
-	 */
-	private function getPostLanguageAsTranslated( $postArgs, $postId, $postLanguage ) {
-		if ( $postLanguage !== $this->defaultLanguage ) {
-			return $postLanguage;
-		}
-
-		$activeLanguages = $this->activeLanguages;
-		$elementType     = apply_filters( 'wpml_element_type', $postArgs['post_type'] );
-		$trid            = apply_filters( 'wpml_element_trid', null, $postId, $elementType );
-		$translations    = apply_filters( 'wpml_get_element_translations', null, $trid, $elementType );
-		foreach ( $activeLanguages as $key => $language ) {
-			if (
-				array_key_exists( $language, $translations )
-				&& $translations[ $language ]->element_id != $postId
-			) {
-				unset( $activeLanguages[ $key ] );
-			}
-		}
-
-		if ( empty( $activeLanguages ) ) {
-			return $postLanguage;
-		}
-
-		return implode( ',', $activeLanguages );
 	}
 
 	/**
