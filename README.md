@@ -44,11 +44,13 @@ This step isn't needed if you download a release instead.
 
 ## Changelog
 
-### 1.1.0
+### 2.0.0
+- **Breakign change**: introduce a different index per language.
 - Fix `wpml_elasticpress` so it analiyzes posts in their own language when indexing them.
 - Fix the dashboard syncing process so it analiyzes posts in their own language when indexing them.
-- Fix the individual post sync-on-save process so it analiyzes the post in its own language.
+- Fix the individual post sync-on-save process so it analiyzes the post in its own language. Update synced content on post trashed or deleted.
 - Fix the custom fields indexing so language codes are not taken as stopwords.
+- Bring support for the `Related posts` feature.
 
 ### 1.0.0
 
