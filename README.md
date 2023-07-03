@@ -4,19 +4,36 @@
 
 ## The main goal
 
-When you activate ElasticPress plugin without our plugin, you will see posts from all languages on the frontend.
-This glue plugin has been created in order to support language information in search results.
-It filters posts according to the current language.
+By default, ElasticPress indexes posts using a single, default language to analyze their content.
 
-To achieve this goal, we append an additional `post_lang` field to Elasticsearch document. 
-It lets us filter them later.
+This has two main problems:
+* As posts are indexed in the default language, they might appear in search results in that default language, and they might be missing in search results in their own language.
+* As posts are indexed in the default language, syncronization can mess with features like stopwords and stemming, resulting in wrongly indexed data.
 
-## Additional parameter in ElasticPress CLI command
+The purpose of this plugin is providing proper indexing for the content based on its own language.
 
-We also added the extra `--post-lang` argument in CLI indexing command.
-You can use it in this way:
+To do so, this glue plugin appends two additional fields to indexed documents:
+* `post_lang` stores all the languages where a post might appear as a search result. This includes the post own language, but also some additional languages in case your post type is set to display as translated when some translations are missing. Posts on non-translatable types store here the default language so they can appear on frontend search results.
+* `post_unique_lang` stored the actual, single language of the each post. Posts on non-translatable types store here the default language.
 
-`wp wpml_elasticpress sync --post-type=post --post-lang=de` which will index only German posts.
+## Additional CLI command
+
+This plugin provides its own `wpml_elasticpress` WP CLI command that extends the `elasticpress` one. When using `wpml_elasticpress`, you can pass some extra attributes:
+
+* `wp wpml_elasticpress sync` will index all your posts in their default language. The process runs in batches, and languages are indexed one after another.
+* `wp wpml_elasticpress sync --post-type=book` will index posts of the type book in their own language, also in batches, one language at a time.
+* `wp wpml_elasticpress sync --post-lang=de,it` will index all posts in German and Italian languages. Note the comma-separated list of language codes.
+* `wp wpml_elasticpress sync --post-type=book --post-lang=it` will index only Italian items on the post type book.
+
+## Dashboard indexing
+
+This plugin will hook into the ElasticPress Sync dashboard, so ElasticPress can index the relevant content in its own WPML language.
+
+To do so, indexing is split in batches per language. The sync log will show the progress when indexing in every language.
+
+## Post save indexing
+
+This plugin will ensure than your posts get synced using the right language when they are created or updated in the WordPress backend.
 
 ## Building from source
 
@@ -27,7 +44,16 @@ This step isn't needed if you download a release instead.
 
 ## Changelog
 
+### 2.0.0
+- **Breaking change**: introduce a different index per language.
+- Fix `wpml_elasticpress` so it analiyzes posts in their own language when indexing them.
+- Fix the dashboard syncing process so it analiyzes posts in their own language when indexing them.
+- Fix the individual post sync-on-save process so it analiyzes the post in its own language. Update synced content on post trashed or deleted.
+- Fix the custom fields indexing so language codes are not taken as stopwords.
+- Bring support for the `Related posts` feature.
+
 ### 1.0.0
 
 - Filter the search by language.
+- Add `wpml_elasticpress` CLI command.
 - Add `post-lang` parameter to CLI indexing command.
