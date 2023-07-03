@@ -40,7 +40,7 @@ class Feature extends \ElasticPress\Feature {
 	 * @param FeatureSupport\Search       $frontendSearch
 	 * @param FeatureSupport\RelatedPosts $frontendRelatedPosts
 	 * @param Stats\Health                $statsHealth
-	 * @param Stats\Report                $statsHealth
+	 * @param Stats\Report                $statsReport
 	 */
 	public function __construct(
 		Field\Search                $fieldSearch,

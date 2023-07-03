@@ -16,7 +16,7 @@ class Search extends FeatureSupport {
 			return;
 		}
 
-		add_filter( 'ep_wp_query_cached_posts', [ $this, 'useIndexByLanguage' ], Constants::LATE_HOOK_PRIORITY, 1 );
+		add_filter( 'ep_wp_query_cached_posts', [ $this, 'useIndexByLanguage' ], Constants::LATE_HOOK_PRIORITY );
 		add_action( 'ep_wp_query_search', [ $this, 'restoreIndexLanguage' ], Constants::LATE_HOOK_PRIORITY );
 	}
 

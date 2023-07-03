@@ -58,7 +58,7 @@ abstract class Field {
 	 */
 	public function mapping( $mapping ) {
 		// Define an analyzer with no filters (no stopwords).
-		$mapping['settings']['analysis']['analyzer']['post_lang_field'] = array(
+		$mapping['settings']['analysis']['analyzer']['post_lang_field']      = array(
 			'type'      => 'custom',
 			'tokenizer' => 'post_lang_tokenizer',
 			'filter'    => [],

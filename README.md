@@ -20,7 +20,7 @@ To do so, this glue plugin appends two additional fields to indexed documents:
 
 This plugin provides its own `wpml_elasticpress` WP CLI command that extends the `elasticpress` one. When using `wpml_elasticpress`, you can pass some extra attributes:
 
-* `wp wpml_elasticpress sync` will index all your posts in their default language. The process is run on batches, and languages are indexed one after another.
+* `wp wpml_elasticpress sync` will index all your posts in their default language. The process runs in batches, and languages are indexed one after another.
 * `wp wpml_elasticpress sync --post-type=book` will index posts of the type book in their own language, also in batches, one language at a time.
 * `wp wpml_elasticpress sync --post-lang=de,it` will index all posts in German and Italian languages. Note the comma-separated list of language codes.
 * `wp wpml_elasticpress sync --post-type=book --post-lang=it` will index only Italian items on the post type book.
@@ -45,7 +45,7 @@ This step isn't needed if you download a release instead.
 ## Changelog
 
 ### 2.0.0
-- **Breakign change**: introduce a different index per language.
+- **Breaking change**: introduce a different index per language.
 - Fix `wpml_elasticpress` so it analiyzes posts in their own language when indexing them.
 - Fix the dashboard syncing process so it analiyzes posts in their own language when indexing them.
 - Fix the individual post sync-on-save process so it analiyzes the post in its own language. Update synced content on post trashed or deleted.

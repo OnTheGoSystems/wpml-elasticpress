@@ -50,7 +50,7 @@ trait TranslationModes {
 		$activeLanguages = $this->activeLanguages;
 		$elementType     = apply_filters( 'wpml_element_type', $postType );
 		$trid            = apply_filters( 'wpml_element_trid', null, $postId, $elementType );
-		$translations    = apply_filters( 'wpml_get_element_translations', null, $trid, $elementType );
+		$translations    = apply_filters( 'wpml_get_element_translations', [], $trid, $elementType );
 		foreach ( $activeLanguages as $key => $language ) {
 			if (
 				array_key_exists( $language, $translations )

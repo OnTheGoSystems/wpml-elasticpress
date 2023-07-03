@@ -46,7 +46,7 @@ class Health {
 	}
 
 	public function addHooks() {
-		add_filter( 'ep_index_health_stats_indices', [ $this, 'includeIndicesInHealthStats' ], 10, 2);
+		add_filter( 'ep_index_health_stats_indices', [ $this, 'includeIndicesInHealthStats' ], 10, 2 );
 	}
 
 	/**
@@ -83,7 +83,7 @@ class Health {
 		}
 		$extraIndices = array_values( array_unique( $extraIndices ) );
 		foreach ( $indices as $index ) {
-			if ( in_array( $index['index'], $extraIndices ) ) {
+			if ( in_array( $index['index'], $extraIndices, true ) ) {
 				$filteredIndices[] = $index;
 			}
 		}

@@ -26,8 +26,8 @@ class Singular {
 	private $defaultLanguage;
 
 	/**
-	 * @param Indices    $indicesManager
 	 * @param Indexables $indexables
+	 * @param Indices    $indicesManager
 	 * @param array      $activeLanguages
 	 * @param string     $defaultLanguage
 	 */
@@ -50,15 +50,15 @@ class Singular {
 		array_walk(
 			$beforeUnsyncHooks,
 			function( $hook ) {
-				add_action( $hook, [ $this, 'startUnsync' ], Constants::EARLY_HOOK_PRIORITY, 1 );
-				add_action( $hook, [ $this, 'clearIndexLanguage' ], Constants::LATE_HOOK_PRIORITY, 1 );
+				add_action( $hook, [ $this, 'startUnsync' ], Constants::EARLY_HOOK_PRIORITY );
+				add_action( $hook, [ $this, 'clearIndexLanguage' ], Constants::LATE_HOOK_PRIORITY );
 			}
 		);
 		$afterUnsyncHooks = [ 'trashed_post', 'deleted_post' ];
 		array_walk(
 			$afterUnsyncHooks,
 			function( $hook ) {
-				add_action( $hook, [ $this, 'completeUnsync' ], Constants::LATE_HOOK_PRIORITY, 1 );
+				add_action( $hook, [ $this, 'completeUnsync' ], Constants::LATE_HOOK_PRIORITY );
 			}
 		);
 	}

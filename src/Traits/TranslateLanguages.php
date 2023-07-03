@@ -102,7 +102,7 @@ trait TranslateLanguages {
 
 		return [
 			'analyzer' => $analyzerLanguage,
-			'snowball' => $snowballLanguage
+			'snowball' => $snowballLanguage,
 		];
 	}
 }

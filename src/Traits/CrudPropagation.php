@@ -29,7 +29,7 @@ trait CrudPropagation {
 	 * @param array  $objectIds
 	 */
 	private function propagateIds( $objectIds ) {
-		foreach( $objectIds as $objectId ) {
+		foreach ( $objectIds as $objectId ) {
 			$object = get_post( $objectId );
 			if ( empty( $object ) ) {
 				continue;
@@ -87,7 +87,7 @@ trait CrudPropagation {
 	 * @param array $languages
 	 */
 	private function registerIdInLanguages( $objectId, $languages ) {
-		foreach( $languages as $language ) {
+		foreach ( $languages as $language ) {
 			$this->registerIdInLanguage( $objectId, $language );
 		}
 	}
@@ -100,6 +100,10 @@ trait CrudPropagation {
 		$this->mainIdsPerLanguage[ $language ][] = $objectId;
 	}
 
+	/**
+	 * @param \WP_Post $object
+	 * @param string   $language
+	 */
 	private function syncDefaultLanguage( $object, $language ) {
 		if ( ! $this->isDisplayAsTranslated( $object->post_type ) ) {
 			return;

@@ -121,7 +121,6 @@ class Dashboard {
 			return;
 		}
 		$this->tearDown();
-		return;
 	}
 
 	public function action_wp_ajax_ep_index() {
@@ -215,7 +214,7 @@ class Dashboard {
 	 * @return array
 	 */
 	private function setResponseLanguagePrefix( $message ) {
-		if ( empty ( $message['message'] ) ) {
+		if ( empty( $message['message'] ) ) {
 			return $message;
 		}
 		$message['message']  = '[' . $this->currentLanguage . '] ' . $message['message'];

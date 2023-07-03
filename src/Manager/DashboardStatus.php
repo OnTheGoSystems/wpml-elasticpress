@@ -117,7 +117,7 @@ class DashboardStatus {
 		array_map( function( $key ) use ( $totals ) {
 			$this->status['totals'][ $key ] = array_merge(
 				$this->status['totals'][ $key ],
-				empty( $totals[ $key ] ) ? [] : $totals[ $key]
+				empty( $totals[ $key ] ) ? [] : $totals[ $key ]
 			);
 		}, $arrayMergers );
 

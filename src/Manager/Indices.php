@@ -46,15 +46,15 @@ class Indices {
 	}
 
 	public function addHooks() {
-		add_filter( 'ep_index_name', [ $this, 'filterIndexName' ], 10, 1 );
-		add_filter( 'ep_global_alias', [ $this, 'filterIndexName' ], 10, 1 );
+		add_filter( 'ep_index_name', [ $this, 'filterIndexName' ], 10 );
+		add_filter( 'ep_global_alias', [ $this, 'filterIndexName' ], 10 );
 
-		add_action( 'wp_initialize_site', [ $this, 'createBlogIndices' ], \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY, 1 );
-		add_action( 'delete_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY, 1 );
-		add_action( 'make_delete_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY, 1 );
-		add_action( 'make_spam_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY, 1 );
-		add_action( 'archive_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY, 1 );
-		add_action( 'deactivate_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY, 1 );
+		add_action( 'wp_initialize_site', [ $this, 'createBlogIndices' ], \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY );
+		add_action( 'delete_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY );
+		add_action( 'make_delete_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY );
+		add_action( 'make_spam_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY );
+		add_action( 'archive_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY );
+		add_action( 'deactivate_blog', array( $this, 'deleteBlogIndices' ), \WPML\ElasticPress\Constants::LATE_HOOK_PRIORITY );
 	}
 
 	/**
@@ -84,6 +84,8 @@ class Indices {
 	}
 
 	/**
+	 * @param  string $indexName
+	 *
 	 * @return bool
 	 */
 	public function indexExists( $indexName ) {

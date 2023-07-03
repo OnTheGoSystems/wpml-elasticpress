@@ -105,7 +105,7 @@ class CLI {
 	}
 
 	/**
-	 * @param array $assocArgs
+	 * @param array $queryArgs
 	 */
 	private function clearCache( $queryArgs ) {
 		// Elasticpress caches item counters during sync to know synced and remaining counts

@@ -41,7 +41,7 @@ class Command extends \ElasticPress\Command {
 		$this->manageIndices( $assocArgs, $languages );
 
 		foreach ( $languages as $language ) {
-			\WP_CLI::log( \WP_CLI::colorize( '%7%k' . sprintf( esc_html__( 'Processing... %s%s%s%s', 'sitepress' ), '%N', '%3%k ', $language, ' %n' ) . '%n' ) );
+			\WP_CLI::log( \WP_CLI::colorize( '%7%k' . sprintf( esc_html( 'Processing... %s%s%s%s' ), '%N', '%3%k ', $language, ' %n' ) . '%n' ) );
 			$assocArgs['post-lang'] = $language;
 			if ( version_compare( EP_VERSION, '4.4.0', '<' ) ) {
 				parent::index( $args, $assocArgs );
@@ -54,19 +54,20 @@ class Command extends \ElasticPress\Command {
 
 	/**
 	 * @param array $assocArgs
+	 * @param array $languages
 	 */
 	private function manageIndices( &$assocArgs, $languages ) {
 		$setupOption = \WP_CLI\Utils\get_flag_value( $assocArgs, 'setup', false );
 		if ( $setupOption ) {
-			\WP_CLI::confirm( esc_html__( 'Indexing with the setup flag will recreate anew all your Elasticsearch indices. Are you sure you want to delete your current Elasticsearch indices?', 'sitepress' ), $assocArgs );
+			\WP_CLI::confirm( esc_html( 'Indexing with the setup flag will recreate anew all your Elasticsearch indices. Are you sure you want to delete your current Elasticsearch indices?' ), $assocArgs );
 			$assocArgs['setup'] = false;
-			\WP_CLI::log( \WP_CLI::colorize( '%7%k' . sprintf( esc_html__( 'Processing... %s%s%s%s', 'sitepress' ), '%N', '%3%k ', esc_html( 'deleting and generating new indices', 'sitepress' ), ' %n' ) . '%n' ) );
+			\WP_CLI::log( \WP_CLI::colorize( '%7%k' . sprintf( esc_html( 'Processing... %s%s%s%s' ), '%N', '%3%k ', esc_html( 'deleting and generating new indices' ), ' %n' ) . '%n' ) );
 			do_action( 'wpml_ep_regenerate_indices', $languages );
-			\WP_CLI::success( esc_html__( 'ElasticPress: indices recreated and ready', 'sitepress' ) );
+			\WP_CLI::success( esc_html( 'ElasticPress: indices recreated and ready' ) );
 			return;
 		}
-		\WP_CLI::log( \WP_CLI::colorize( '%7%k' . sprintf( esc_html__( 'Processing... %s%s%s%s', 'sitepress' ), '%N', '%3%k ', esc_html( 'generating missing indices', 'sitepress' ), ' %n' ) . '%n' ) );
+		\WP_CLI::log( \WP_CLI::colorize( '%7%k' . sprintf( esc_html( 'Processing... %s%s%s%s' ), '%N', '%3%k ', esc_html( 'generating missing indices' ), ' %n' ) . '%n' ) );
 		do_action( 'wpml_ep_check_indices', $languages );
-		\WP_CLI::success( esc_html__( 'ElasticPress: indices ready', 'sitepress' ) );
+		\WP_CLI::success( esc_html( 'ElasticPress: indices ready' ) );
 	}
 }
