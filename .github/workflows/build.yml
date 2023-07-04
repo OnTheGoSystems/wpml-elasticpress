@@ -26,5 +26,5 @@ jobs:
       - name: Upload plugin
         uses: actions/upload-artifact@v2
         with:
-          name: wpml-elasticpress.zip
+          name: wpml-elasticpress
           path: .
