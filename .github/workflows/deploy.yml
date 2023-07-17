@@ -1,0 +1,45 @@
+name: OTGS Deploy
+
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  AWS_REGION: "us-east-1"
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set github token for composer
+        run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build plugin
+        run: composer install --no-dev --prefer-dist --no-progress --no-suggest
+
+      - name: Clean up files
+        run: |
+          rm ./.gitignore ./.gitlab-ci.yml
+          rm ./composer.* ./Makefile ./phpcs.* ./phpunit.xml ./run.sh
+          rm -Rf tests
+          find . -type d | grep '.git' | xargs rm -rf
+
+      - name: Generate package
+        run: zip wpml-elasticpress.${{ github.ref_name }}.zip ./* -r
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: ${{ secrets.GITHUBROLE }}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy artifact
+        run:
+          aws s3 cp ./wpml-elasticpress.${{ github.ref_name }}.zip s3://${{ secrets.S3_BUCKET }}/wpml-elasticpress.${{ github.ref_name }}.zip
