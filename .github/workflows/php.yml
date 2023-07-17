@@ -1,4 +1,5 @@
-name: OTGS CI
+name: OTGS PHP UNIT
+run-name: PHP Unit at ${{ github.ref_name }}
 
 on: [push, pull_request]
 
@@ -15,9 +16,6 @@ jobs:
 
       - name: Set github token for composer
         run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
-
-#      - name: Validate composer.json and composer.lock
-#        run: composer validate
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
