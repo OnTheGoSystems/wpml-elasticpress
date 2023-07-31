@@ -16,12 +16,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          path: wpml-elasticpress
 
       - name: Set github token for composer
         run: composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
+        working-directory: ./wpml-elasticpress
 
       - name: Build plugin
         run: composer install --no-dev --prefer-dist --no-progress --no-suggest
+        working-directory: ./wpml-elasticpress
 
       - name: Clean up files
         run: |
@@ -29,6 +33,7 @@ jobs:
           rm ./composer.* ./Makefile ./phpcs.* ./phpunit.xml ./run.sh
           rm -Rf tests
           find . -type d | grep '.git' | xargs rm -rf
+        working-directory: ./wpml-elasticpress
 
       - name: Generate package
         run: zip wpml-elasticpress.${{ github.ref_name }}.zip ./* -r
