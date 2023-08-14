@@ -12,6 +12,10 @@ class Indices {
 
 	use TranslateLanguages;
 
+	const STOPWORD_FILTER_SLUG        = 'ep_stop';
+	// Before ElasticPress 4.7.0
+	const LEGACY_STOPWORD_FILTER_SLUG = 'stop';
+
 	/** @var Elasticsearch */
 	private $elasticsearch;
 
@@ -26,6 +30,9 @@ class Indices {
 
 	/** @var string */
 	private $currentIndexLanguage = '';
+
+	/** @var string|null */
+	private $stopwordFilterSlug = null;
 
 	/**
 	 * @param Elasticsearch $elasticsearch
@@ -93,6 +100,24 @@ class Indices {
 	}
 
 	/**
+	 * @param  array $filtersList
+	 *
+	 * @return string|null
+	 */
+	private function getStopwordFilterKey( $filtersList ) {
+		if ( null !== $this->stopwordFilterSlug ) {
+			return $this->stopwordFilterSlug;
+		}
+		if ( in_array( self::LEGACY_STOPWORD_FILTER_SLUG, $filtersList, true ) ) {
+			$this->stopwordFilterSlug = self::LEGACY_STOPWORD_FILTER_SLUG;
+		}
+		if ( in_array( self::STOPWORD_FILTER_SLUG, $filtersList, true ) ) {
+			$this->stopwordFilterSlug = self::STOPWORD_FILTER_SLUG;
+		}
+		return $this->stopwordFilterSlug;
+	}
+
+	/**
 	 * @param Indexable $indexable
 	 */
 	public function generateIndexByIndexable( $indexable ) {
@@ -101,7 +126,7 @@ class Indices {
 			return;
 		}
 		$mapping = $indexable->generate_mapping();
-		if ( 'en' === $this->currentIndexLanguage ) {
+		if ( $this->defaultLanguage === $this->currentIndexLanguage ) {
 			$this->elasticsearch->put_mapping( $indexName, $mapping );
 			return;
 		}
@@ -112,24 +137,18 @@ class Indices {
 		$mapping['settings']['analysis']['analyzer']['default']['language'] = $languages['analyzer'];
 		$mapping['settings']['analysis']['filter']['ewp_snowball']['language'] = $languages['snowball'];
 
-		// Set language stopwords and stemmer filters
-		$mapping['settings']['analysis']['analyzer']['default']['filter'] = array_map(
-			function( $filter ) use ( $currentIndexLanguage ) {
-				if ( 'stop' === $filter ) {
-					return 'stop_' . $currentIndexLanguage;
-				}
-				return $filter;
-			},
-			$mapping['settings']['analysis']['analyzer']['default']['filter']
-		);
-		$mapping['settings']['analysis']['analyzer']['default']['filter'][] = 'stemmer_' . $this->currentIndexLanguage;
+		// Define language stopwords
+		$stopwordFilterKey = $this->getStopwordFilterKey( $mapping['settings']['analysis']['analyzer']['default']['filter'] );
+		if ( null !== $stopwordFilterKey ) {
+			$mapping['settings']['analysis']['filter'][ $stopwordFilterKey ] = [
+				'type'        => 'stop',
+				'ignore_case' => true,
+				'stopwords'   => '_' . $languages['analyzer'] . '_',
+			];
+		}
 
-		// Define language stopwords and stemmer filters
-		$mapping['settings']['analysis']['filter']['stop_' . $this->currentIndexLanguage] = [
-			'type'        => 'stop',
-			'ignore_case' => true,
-			'stopwords'   => '_' . $languages['analyzer'] . '_',
-		];
+		// Define language stemmer
+		$mapping['settings']['analysis']['analyzer']['default']['filter'][] = 'stemmer_' . $this->currentIndexLanguage;
 		$mapping['settings']['analysis']['filter']['stemmer_' . $this->currentIndexLanguage] = [
 			'type'        => 'stemmer',
 			'language'    => $languages['analyzer'],
