@@ -200,7 +200,7 @@ trait CrudPropagation {
 	 */
 	private function combineIds( $role = 'main' ) {
 		$idsPerLanguage = $this->getIds( $role );
-		return array_unique( call_user_func_array( 'array_merge', $idsPerLanguage ) );
+		return array_unique( call_user_func_array( 'array_merge', array_values( $idsPerLanguage ) ) );
 	}
 
 	/**
