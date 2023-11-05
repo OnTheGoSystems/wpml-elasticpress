@@ -8,6 +8,10 @@ class Plugin {
 	// ElasticPrtess loads its features at plugins_loaded:10.
 	const INIT_PRIORITY = 11;
 
+	// Before ElasticPress 5.0.0, the Dashboard sync was run over AJAX.
+	// After ElasticPress 5.0.0, the Dashboard sync is run over the REST API.
+	const DASHBOARD_SYNC_API_CHANGE_V1 = '5.0.0';
+
 	public static function init() {
 		add_action( 'plugins_loaded', function () {
 			if ( ! defined( 'EP_VERSION' ) || version_compare( EP_VERSION, '3.0.0', '<' ) ) {
@@ -17,6 +21,8 @@ class Plugin {
 			if ( ! defined( 'ICL_SITEPRESS_VERSION' ) ) {
 				return;
 			}
+
+			$elasticPressVersion  = EP_VERSION;
 
 			$activeLanguagesData  = apply_filters( 'wpml_active_languages', [] );
 			$activeLanguages      = array_keys( $activeLanguagesData );
@@ -37,6 +43,26 @@ class Plugin {
 			);
 			$indicesManager->addHooks();
 
+			$syncDashboard = version_compare( $elasticPressVersion, self::DASHBOARD_SYNC_API_CHANGE_V1, '<' )
+				? new Sync\DashboardAjax(
+						$indexables,
+						$indicesManager,
+						new Manager\DashboardStatus(
+							$activeLanguages
+						),
+						$activeLanguages,
+						$defaultLanguage
+					)
+				: new Sync\DashboardRest(
+						$indexables,
+						$indicesManager,
+						new Manager\DashboardStatus(
+							$activeLanguages
+						),
+						$activeLanguages,
+						$defaultLanguage
+					);
+
 			$feature = new Feature(
 				new Field\Search(
 					$elasticsearchVersion,
@@ -50,20 +76,13 @@ class Plugin {
 					$defaultLanguage,
 					$currentLanguage
 				),
-				new Sync\Dashboard(
-					$indexables,
-					$indicesManager,
-					new Manager\DashboardStatus(
-						$activeLanguages
-					),
-					$activeLanguages,
-					$defaultLanguage
-				),
+				$syncDashboard,
 				new Sync\Singular(
 					$indexables,
 					$indicesManager,
 					$activeLanguages,
-					$defaultLanguage
+					$defaultLanguage,
+					$elasticPressVersion
 				),
 				new Sync\CLI(
 					$indexables,

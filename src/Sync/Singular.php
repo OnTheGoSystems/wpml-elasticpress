@@ -13,6 +13,18 @@ class Singular {
 
 	use CrudPropagation;
 
+	/**
+	 * In ElasticPress 5.0.0, the \ElasticPress\SyncManager::sync_queue attribute mutated:
+	 * - Before, it was an array indexed by post IDs with a TRUE value for those modified.
+	 * - After, those same entries got spread in parent arrays per site ID.
+	 *
+	 * For example, [ 123 => true ] became [ 1 => [ 123 => true ] ],
+	 * where 1 is the a block ID and 123 is a post ID for a post in the blog with ID equal 1.
+	 *
+	 * Nice for them to change some public data structure, right? Well, life!
+	 */
+	const SYNC_QUEUE_API_CHANGE_V1 = '5.0.0';
+
 	/** @var Indexables */
 	private $indexables;
 
@@ -25,22 +37,28 @@ class Singular {
 	/** @var string */
 	private $defaultLanguage;
 
+	/** @var string */
+	private $elasticPressVersion;
+
 	/**
 	 * @param Indexables $indexables
 	 * @param Indices    $indicesManager
 	 * @param array      $activeLanguages
 	 * @param string     $defaultLanguage
+	 * @param string     $elasticPressVersion
 	 */
 	public function __construct(
 		Indexables $indexables,
 		Indices    $indicesManager,
 		$activeLanguages,
-		$defaultLanguage
+		$defaultLanguage,
+		$elasticPressVersion
 	) {
-		$this->indexables      = $indexables;
-		$this->indicesManager  = $indicesManager;
-		$this->activeLanguages = $activeLanguages;
-		$this->defaultLanguage = $defaultLanguage;
+		$this->indexables          = $indexables;
+		$this->indicesManager      = $indicesManager;
+		$this->activeLanguages     = $activeLanguages;
+		$this->defaultLanguage     = $defaultLanguage;
+		$this->elasticPressVersion = $elasticPressVersion;
 	}
 
 	public function addHooks() {
@@ -61,6 +79,22 @@ class Singular {
 				add_action( $hook, [ $this, 'completeUnsync' ], Constants::LATE_HOOK_PRIORITY );
 			}
 		);
+	}
+
+	/**
+	 * @param  \ElasticPress\SyncManager $syncManager
+	 *
+	 * @return int[]
+	 */
+	private function getIdsInSyncQueue( $syncManager ) {
+		$syncQueue = $syncManager->sync_queue;
+
+		if ( version_compare( $this->elasticPressVersion, self::SYNC_QUEUE_API_CHANGE_V1, '<' ) ) {
+			return array_keys( $syncQueue );
+		}
+		$currentBlogId           = get_current_blog_id();
+		$syncQueueForCurrentBlog = $syncQueue[ $currentBlogId ] ?? [];
+		return array_keys( $syncQueueForCurrentBlog ) ;
 	}
 
 	/**
@@ -94,7 +128,7 @@ class Singular {
 		//     - Maybe remove the ID for the default language post from the current language index
 		//         - Skip those which do not exist in the current language index (when updating an existing translation, for example)
 		//     - Maybe sync the default language post in the default language index to sync language field values
-		$this->propagateIds( array_keys( $syncManager->sync_queue ) );
+		$this->propagateIds( $this->getIdsInSyncQueue( $syncManager ) );
 
 		$this->manageIds( 'sync', 'main' );
 		$this->manageIds( 'delete', 'related' );
