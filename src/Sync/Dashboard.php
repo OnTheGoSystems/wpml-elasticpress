@@ -4,14 +4,13 @@ namespace WPML\ElasticPress\Sync;
 
 use ElasticPress\Indexables;
 use ElasticPress\IndexHelper;
-use ElasticPress\Utils;
 
 use WPML\ElasticPress\Manager\Indices;
 use WPML\ElasticPress\Manager\DashboardStatus;
 
 use WPML\ElasticPress\Traits\ManageIndexables;
 
-class Dashboard {
+abstract class Dashboard {
 
 	use ManageIndexables;
 
@@ -19,19 +18,22 @@ class Dashboard {
 	private $indexables;
 
 	/** @var Indices */
-	private $indicesManager;
+	protected $indicesManager;
 
 	/** @var DashboardStatus */
-	private $status;
+	protected $status;
 
 	/** @var array */
-	private $activeLanguages;
+	protected $activeLanguages;
 
 	/** @var string */
 	private $defaultLanguage;
 
 	/** @var string */
 	private $currentLanguage = '';
+
+	/** @var array */
+	private $fullIndexArgs = [];
 
 	/**
 	 * @param Indexables      $indexables
@@ -54,20 +56,30 @@ class Dashboard {
 		$this->defaultLanguage       = $defaultLanguage;
 	}
 
-	public function addHooks() {
-		if ( 0 === count( $this->activeLanguages ) ) {
+	abstract public function addHooks();
+
+	/**
+	 * @param array $args
+	 */
+	protected function setFullIndexArgs( $args ) {
+		$this->fullIndexArgs = $args;
+	}
+
+	protected function setUpAndRun() {
+		$this->prepare();
+		if ( empty( $this->status->get('currentLanguage') ) ) {
 			return;
 		}
+		$this->maybePutMapping();
+		$this->beforeFullIndex();
 
-		add_action( 'wp_ajax_ep_index', [ $this, 'action_wp_ajax_ep_index' ], 9 );
-		add_action( 'wp_ajax_ep_cancel_index', [ $this, 'action_wp_ajax_ep_cancel_index' ], 9 );
+		// This happens on an AJAX call, hence on admin: force the display-as-translated snippet in queries
+		add_filter( 'wpml_should_use_display_as_translated_snippet', '__return_true' );
+
+		$this->runFullIndex( $this->fullIndexArgs );
 	}
 
-	private function setUp() {
-		$this->status->prepare();
-	}
-
-	private function tearDown() {
+	protected function tearDown() {
 		$this->indicesManager->clearCurrentIndexLanguage();
 		$this->status->delete();
 	}
@@ -82,25 +94,14 @@ class Dashboard {
 		$this->indicesManager->clearCurrentIndexLanguage();
 	}
 
-	private function isDashboardSync() {
-		if ( ! check_ajax_referer( 'ep_dashboard_nonce', 'nonce', false ) || ! EP_DASHBOARD_SYNC ) {
-			wp_send_json_error( null, 403 );
-			exit;
-		}
-
-		$index_meta = Utils\get_indexing_status();
-
-		if ( isset( $index_meta['method'] ) && 'cli' === $index_meta['method'] ) {
-			return false;
-		}
-
-		return true;
+	private function prepare() {
+		$this->status->prepare();
 	}
 
 	private function maybePutMapping() {
 		$putMapping = ! empty( $_REQUEST['put_mapping'] );
 
-		if ( $putMapping && false === $this->status->get('putMapping') ) {
+		if ( ( $putMapping || $forcePutMapping ) && false === $this->status->get('putMapping') ) {
 			$this->indicesManager->clearAllIndices();
 			$this->status->set('putMapping', true);
 		}
@@ -116,44 +117,31 @@ class Dashboard {
 		$this->status->logIndexablesToReset( $this->deactivateIndexables() );
 	}
 
-	public function action_wp_ajax_ep_cancel_index() {
-		if ( false === $this->isDashboardSync() ) {
-			return;
-		}
-		$this->tearDown();
-	}
-
-	public function action_wp_ajax_ep_index() {
-		if ( false === $this->isDashboardSync() ) {
-			return;
-		}
-		$this->setUp();
-		if ( empty( $this->status->get('currentLanguage') ) ) {
-			return;
-		}
-		$this->maybePutMapping();
-		$this->beforeFullIndex();
-
-		// This happens on an AJAX call, hence on admin: force the display-as-translated snippet in queries
-		add_filter( 'wpml_should_use_display_as_translated_snippet', '__return_true' );
-
-		IndexHelper::factory()->full_index(
+	/**
+	 * @param array $forcedArgs
+	 */
+	private function runFullIndex( $forcedArgs = [] ) {
+		$args = array_merge(
 			[
 				'method'        => 'dashboard',
-				'put_mapping'   => false,
-				'output_method' => [ $this, 'indexOutput' ],
-				'show_errors'   => true,
 				'network_wide'  => 0,
-			]
+				'show_errors'   => true,
+			],
+			$forcedArgs
 		);
+
+    $args['put_mapping']   = false;
+    $args['output_method'] = [ $this, 'indexOutput' ];
+
+		IndexHelper::factory()->full_index( $args );
 	}
 
 	private function syncComplete() {
 		$message = [
-			'message' => 'Sync complete',
+			'message'    => 'Sync complete',
 			'index_meta' => null,
-			'totals' => $this->status->get('totals'),
-			'status' => 'success'
+			'totals'     => $this->status->get('totals'),
+			'status'     => 'success'
 		];
 		$this->tearDown();
 		wp_send_json_success( $message );
@@ -200,9 +188,9 @@ class Dashboard {
 		// Hijack the message data so the next language gets processed
 		$message['totals']     = [];
 		$message['index_meta'] = [
-			'method' => 'web',
-			'totals' => $this->status->get('totals'),
-			'sync_stack' => [],
+			'method'      => 'web',
+			'totals'      => $this->status->get('totals'),
+			'sync_stack'  => [],
 			'put_mapping' => $this->status->get('putMapping'),
 		];
 		return $message;

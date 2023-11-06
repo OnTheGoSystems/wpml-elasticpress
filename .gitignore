@@ -40,6 +40,7 @@ tests/wordpress
 Thumbs.db
 /tests/compatibility/*.txt
 .DS_Store
+.vscode
 
 inc/sandbox.inc
 *.sh
