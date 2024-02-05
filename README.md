@@ -35,10 +35,26 @@ To do so, indexing is split in batches per language. The sync log will show the 
 
 This plugin will ensure than your posts get synced using the right language when they are created or updated in the WordPress backend.
 
+## Feature support
+
+ElasticPress provides several features. We provide compatibility with some of them:
+* [x] Post Search
+* [ ] Instant Results
+* [ ] Autosuggest
+* [ ] Did You Mean
+* [ ] WooCommerce
+* [ ] Filters
+* [x] Related Posts
+* [ ] Custom Search Results
+* [ ] Protected Content
+* [ ] Documents
+
+Additional compatibility with other features will be added in future releases.
+
 ## Building from source
 
 After cloning this repository you need to generate the autoloader:
-`composer dumpautoload`
+`composer dump-autoload`
 
 This step isn't needed if you download a release instead.
 
