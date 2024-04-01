@@ -101,7 +101,7 @@ abstract class Dashboard {
 	private function maybePutMapping() {
 		$putMapping = ! empty( $_REQUEST['put_mapping'] );
 
-		if ( ( $putMapping || $forcePutMapping ) && false === $this->status->get('putMapping') ) {
+		if ( $putMapping && false === $this->status->get('putMapping') ) {
 			$this->indicesManager->clearAllIndices();
 			$this->status->set('putMapping', true);
 		}
