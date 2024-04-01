@@ -15,6 +15,7 @@ namespace ElasticPress {
 	 	 * @param array<string,mixed> $assocArgs
 	 	 */
 		function index( $args, $assoc_args ) {}
+
 	}
 
 	class Feature {
@@ -150,7 +151,7 @@ namespace ElasticPress {
 
 	class Indexable {
 
-			/** @var SyncManager */
+		/** @var SyncManager */
 		public $sync_manager;
 
 		/**
@@ -196,14 +197,14 @@ namespace ElasticPress {
 		 * @param array $args Arguments.
 	 	 */
 		public function full_index( $args ) {}
+
 	}
+
 }
 
 namespace ElasticPress\StatusReport {
 
-	class Report {
-		
-	}
+	class Report {}
 
 	class Indices {
 

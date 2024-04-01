@@ -1,6 +1,7 @@
 <?php
 
 namespace {
+
 	class WP_CLI {
 
 		/**
@@ -25,6 +26,7 @@ namespace {
 		public static function add_command( string $name, mixed $callable, array $args = [] ): bool {}
 
 	}
+
 }
 
 namespace WP_CLI\Utils {
