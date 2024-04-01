@@ -121,10 +121,10 @@ class DashboardStatus {
 			);
 		}, $arrayMergers );
 
-		// Log las value provided
+		// Log last value provided
 		$replacers = [ 'end_date_time', 'end_time_gmt' ];
 		array_map( function( $key ) use ( $totals ) {
-			$this->status['totals'][ $key ] = empty( $partialTotals['end_date_time'] )
+			$this->status['totals'][ $key ] = empty( $totals['end_date_time'] )
 			? $this->status['totals'][ $key ]
 			: $totals[ $key ];
 		}, $replacers );
