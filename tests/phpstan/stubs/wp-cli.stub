@@ -1,0 +1,37 @@
+<?php
+
+namespace {
+	class WP_CLI {
+
+		/**
+		 * @param string $string
+		 * @return string
+		 */
+		public static function colorize( string $string ): string {}
+
+		public static function log( string $message ): void {}
+
+		/**
+		 * @param array<string,mixed> $assoc_args
+		 */
+		public static function confirm( string $question, array $assoc_args = [] ): void {}
+
+		public static function success( string $message ): void {}
+
+		/**
+		 * @param callable|object|string $callable
+		 * @param array<string,mixed> $args
+		 */
+		public static function add_command( string $name, mixed $callable, array $args = [] ): bool {}
+
+	}
+}
+
+namespace WP_CLI\Utils {
+
+	/**
+	 * @param array<string,mixed> $assoc_args
+	 */
+	function get_flag_value( array $assoc_args, string $flag, mixed $default = null ): mixed {}
+
+}

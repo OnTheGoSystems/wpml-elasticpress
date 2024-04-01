@@ -183,10 +183,14 @@ class Indices {
 	 * @param \WP_Site $blog
 	 */
 	public function createBlogIndices( $blog ) {
-		$syncManager = $this->indexables->get( \WPML\ElasticPress\Constants::INDEXABLE_SLUG_POST )->sync_manager;
+		$indexable = $this->indexables->get( \WPML\ElasticPress\Constants::INDEXABLE_SLUG_POST );
+		if ( false === $indexable ) {
+			return;
+		}
+
 		foreach ( $this->activeLanguages as $language ) {
 			$this->setCurrentIndexLanguage( $language );
-			$syncManager->action_create_blog_index( $blog );
+			$indexable->sync_manager->action_create_blog_index( $blog );
 			$this->clearCurrentIndexLanguage();
 		}
 	}

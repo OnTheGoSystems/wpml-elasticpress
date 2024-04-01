@@ -1,0 +1,19 @@
+parameters:
+  level: 3
+  featureToggles:
+    disableRuntimeReflectionProvider: true
+  bootstrapFiles:
+    - tests/phpstan/bootstrap.php
+    - tests/phpstan/stubs/elasticpress.stub
+    - tests/phpstan/stubs/wp-cli.stub
+  paths:
+    - src
+  dynamicConstantNames:
+    - EP_VERSION
+    - EP_DASHBOARD_SYNC
+
+  checkFunctionNameCase: true
+  inferPrivatePropertyTypeFromConstructor: true
+
+  parallel:
+    processTimeout: 300.0
