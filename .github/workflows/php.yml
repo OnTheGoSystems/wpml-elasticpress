@@ -1,5 +1,5 @@
-name: OTGS PHP UNIT
-run-name: PHP Unit at ${{ github.ref_name }}
+name: OTGS PHP TEST
+run-name: PHP TEST at ${{ github.ref_name }}
 
 on: [push, pull_request]
 
@@ -20,5 +20,8 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
 
-      - name: Run test suite
+      - name: Run unit test suite
         run: ./vendor/bin/phpunit
+
+      - name: Run static test suite
+        run: ./vendor/bin/phpstan

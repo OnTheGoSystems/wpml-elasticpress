@@ -1,0 +1,244 @@
+<?php
+
+namespace ElasticPress {
+
+	class Command {
+
+		/**
+		 * @param mixed[]             $args
+	 	 * @param array<string,mixed> $assocArgs
+	 	 */
+		function sync( $args, $assoc_args ) {}
+
+		/**
+		 * @param mixed[]             $args
+	 	 * @param array<string,mixed> $assocArgs
+	 	 */
+		function index( $args, $assoc_args ) {}
+
+	}
+
+	class Feature {
+	
+		public function __construct() {}
+
+		/**
+		 * @return boolean
+		 */
+		public function is_active() {}
+
+	}
+
+	class Features {
+
+		/**
+		 * @param  string $slug
+		 * @return Feature|false
+	 	 */
+		public function get_registered_feature( $slug ) {}
+
+		/**
+		 * @return self
+	 	 */
+		public static function factory() {}
+
+		/**
+		 * @param  Feature $feature An instance of the Feature class
+	 	 * @return boolean
+	 	 */
+		public function register_feature( Feature $feature ) {}
+
+	}
+
+	class Elasticsearch {
+
+		/**
+		 * @param  string $index Index name.
+		 * @return boolean
+		 */
+		public function index_exists( $index ) {}
+
+		/**
+		 *
+		 * @param  string $index Index name.
+		 * @param  array  $mapping Mapping array.
+		 * @param  string $return_type Desired return type. Can be either 'bool' or 'raw'
+		 * @return boolean|WP_Error
+		 */
+		public function put_mapping( $index, $mapping, $return_type = 'bool' ) {}
+
+		/**
+		 * @return boolean
+	 	 */
+		public function delete_all_indices() {}
+
+		/**
+		 * @return self
+	 	 */
+		public static function factory() {}
+
+		/**
+		 * @param  bool $force Bust cache or not.
+	 	 * @return string|bool
+	 	 */
+		public function get_elasticsearch_version( $force = false ) {}
+
+	}
+
+	class SyncManager {
+
+		/** @var array */
+		public $sync_queue = [];
+
+		/**
+		 * @param WP_Site $blog New site object.
+	 	 */
+		public function action_create_blog_index( $blog ) {}
+
+		/**
+		 * @param int $blog_id
+	 	 */
+		public function action_delete_blog_from_index( $blog_id ) {}
+
+		/**
+		 * @param int $post_id Post id.
+	 	 */
+		public function action_sync_on_update( $post_id ) {}
+
+	}
+
+	class Indexables {
+	
+		/** @var SyncManager */
+		public $sync_manager;
+
+		/**
+		 * @param  boolean $global    If true or false, will only get Indexables with that global property.
+		 * @param  boolean $slug_only True returns an array of only string slugs.
+	 	 * @param  string  $status    Whether to return active indexables or all registered.
+		 * @return array
+		 */
+		public function get_all( $global = null, $slug_only = false, $status = 'active' ) {}
+
+		/**
+		 * @param  string $slug Indexable type slug.
+	 	 * @return Indexable|false
+	 	 */
+		public function get( $slug ) {}
+
+		/**
+		 * @return self
+	 	 */
+		public static function factory() {}
+
+		/**
+		 * @param string $slug Indexable slug
+		 * @return boolean
+		 */
+		public function is_active( string $slug ) : bool {}
+
+		/**
+		 * @param string $slug The indexable slug
+		 */
+		public function deactivate( string $slug ) {}
+
+		/**
+	 	 * @param string $slug The indexable slug
+	 	 */
+		public function activate( string $slug ) {}
+
+	}
+
+	class Indexable {
+
+		/** @var SyncManager */
+		public $sync_manager;
+
+		/**
+		 * @param  int $blog_id `null` means current blog.
+		 * @return string
+		 */
+		public function get_index_name( $blog_id = null ) {}
+
+		/**
+		 * @return array
+		 */
+		public function generate_mapping() {}
+
+		/**
+		 * @param  array $object_ids Array of object IDs.
+	 	 * @return array[WP_Error|array] The return of each request made.
+	 	 */
+		public function bulk_index_dynamically( $object_ids ) {}
+
+		/**
+	 	 * @param  int $object_id Object to get.
+	 	 * @return boolean|array
+	 	 */
+		public function get( $object_id ) {}
+
+		/**
+	 	 * @param  int     $object_id Object to delete.
+	 	 * @param  boolean $blocking Whether to issue blocking HTTP request or not.
+	 	 * @return boolean
+	 	 */
+		public function delete( $object_id, $blocking = true ) {}
+
+	}
+
+	class IndexHelper {
+
+		/**
+		 * @return self
+		 */
+		public static function factory() {}
+
+		/**
+		 * @param array $args Arguments.
+	 	 */
+		public function full_index( $args ) {}
+
+	}
+
+}
+
+namespace ElasticPress\StatusReport {
+
+	class Report {}
+
+	class Indices {
+
+			/**
+			 * @return array
+			 */
+			public function get_groups() {}
+
+			/**
+			 * @return string
+			 */
+			public function get_title() {}
+
+	}
+
+}
+
+namespace ElasticPress\Utils {
+
+	/**
+	 * @param int  $limit          The maximum amount of sites retrieved, Use 0 to return all sites.
+ 	 * @param bool $only_indexable Whether should be returned only indexable sites or not.
+ 	 * @return array
+ 	 */
+	function get_sites( $limit = 0, $only_indexable = false ) {}
+
+	/**
+	 * @return array|boolean
+ 	 */
+	function get_indexing_status() {}
+
+	/**
+	 * @return string
+ 	 */
+	function get_capability() {}
+
+}

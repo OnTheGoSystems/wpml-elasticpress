@@ -31,11 +31,20 @@ class Feature extends \ElasticPress\Feature {
 	/** @var Stats\Report */
 	private $statsReport;
 
+	/** @var string */
+	public $slug;
+
+	/** @var string */
+	public $title;
+
+	/** @var bool */
+	public $requires_install_reindex = false;
+
 	/**
 	 * @param Field\Search                $fieldSearch
 	 * @param Field\Sync                  $fieldSync
 	 * @param Sync\Dashboard              $syncDashboard
-	 * @param Sync\singular               $syncSingular
+	 * @param Sync\Singular               $syncSingular
 	 * @param Sync\CLI                    $syncCli
 	 * @param FeatureSupport\Search       $frontendSearch
 	 * @param FeatureSupport\RelatedPosts $frontendRelatedPosts

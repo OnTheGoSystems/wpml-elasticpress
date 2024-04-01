@@ -170,15 +170,25 @@ trait CrudPropagation {
 	 */
 	private function syncIds( $ids ) {
 		$postIndexable = $this->indexables->get( \WPML\ElasticPress\Constants::INDEXABLE_SLUG_POST );
+		if ( false === $postIndexable ) {
+			return;
+		}
+
 		$this->indicesManager->generateIndexByIndexable( $postIndexable );
 		$postIndexable->bulk_index_dynamically( $ids );
 	}
 
 	/**
 	 * @param array $ids
+	 *
+	 * @return array
 	 */
 	private function deleteIds( $ids ) {
 		$postIndexable = $this->indexables->get( \WPML\ElasticPress\Constants::INDEXABLE_SLUG_POST );
+		if ( false === $postIndexable ) {
+			return [];
+		}
+
 		$indexName = $postIndexable->get_index_name();
 		if ( ! $this->indicesManager->indexExists( $indexName ) ) {
 			return [];
