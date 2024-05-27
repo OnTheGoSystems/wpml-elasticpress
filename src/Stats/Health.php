@@ -60,7 +60,8 @@ class Health {
 		$indexable_sites = [];
 
 		if ( $this->networkActivated ) {
-			$indexable_sites = Utils\get_sites();
+			$indexable_sites = Utils\get_sites( 0, true );
+			$indexable_sites = wp_list_pluck( $indexable_sites, 'blog_id' );
 		};
 
 		$extraIndices = [];
