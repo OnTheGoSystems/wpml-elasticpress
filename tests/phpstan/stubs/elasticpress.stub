@@ -68,6 +68,11 @@ namespace ElasticPress {
 		public function put_mapping( $index, $mapping, $return_type = 'bool' ) {}
 
 		/**
+		 * @return string[]
+	 	 */
+		public function get_cluster_indices() {}
+
+		/**
 		 * @return boolean
 	 	 */
 		public function delete_all_indices() {}
@@ -159,6 +164,11 @@ namespace ElasticPress {
 		 * @return string
 		 */
 		public function get_index_name( $blog_id = null ) {}
+
+		/**
+		 * @return array
+		 */
+		public function get_indexable_post_status() {}
 
 		/**
 		 * @return array
