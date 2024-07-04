@@ -79,6 +79,8 @@ class Singular {
 				add_action( $hook, [ $this, 'completeUnsync' ], Constants::LATE_HOOK_PRIORITY );
 			}
 		);
+
+		add_action( 'transition_post_status', [ $this, 'maybeUnsyncByStatus' ], Constants::LATE_HOOK_PRIORITY, 3 );
 	}
 
 	/**
@@ -105,7 +107,7 @@ class Singular {
 	 * @return bool
 	 */
 	public function manageSyncQueue( $halt, $syncManager, $indexableSlug ) {
-		if ( \WPML\ElasticPress\Constants::INDEXABLE_SLUG_POST !== $indexableSlug ) {
+		if ( Constants::INDEXABLE_SLUG_POST !== $indexableSlug ) {
 			return $halt;
 		}
 
@@ -232,6 +234,31 @@ class Singular {
 	 */
 	public function clearIndexLanguageByMeta( $metaId, $postId ) {
 		$this->clearIndexLanguage( $postId );
+	}
+
+	/**
+	 * @param string   $newStatus
+	 * @param string   $oldStatus
+	 * @param \WP_Post $post
+	 */
+	public function maybeUnsyncByStatus( $newStatus, $oldStatus, $post ) {
+		if ( $oldStatus === $newStatus ) {
+			return;
+		}
+
+		$postIndexable = $this->indexables->get( Constants::INDEXABLE_SLUG_POST );
+		if ( false === $postIndexable ) {
+			return;
+		}
+
+		$indexablePostStati = $postIndexable->get_indexable_post_status();
+		if ( in_array( $post->post_status, $indexablePostStati, true ) ) {
+			return;
+		}
+
+		$this->startUnsync( $post->ID );
+		$this->clearIndexLanguage( $post->ID );
+		$this->completeUnsync( $post->ID );
 	}
 
 }
