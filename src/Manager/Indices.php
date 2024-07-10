@@ -34,6 +34,9 @@ class Indices {
 	/** @var string|null */
 	private $stopwordFilterSlug = null;
 
+	/** @var string[]|null */
+	private static $clusterIndices = null;
+
 	/**
 	 * @param Elasticsearch $elasticsearch
 	 * @param Indexables    $indexables
@@ -91,12 +94,45 @@ class Indices {
 	}
 
 	/**
+	 * @return string[]
+	 */
+	private function getClusterIndicesCache() {
+		if ( null === self::$clusterIndices ) {
+			$clusterIndices = $this->elasticsearch->get_cluster_indices();
+			self::$clusterIndices = wp_list_pluck( $clusterIndices, 'index' );
+		}
+
+		return self::$clusterIndices;
+	}
+
+	/**
+	 * @param string $indexName
+	 */
+	private function saveIndexInClusterCache( $indexName ) {
+		if ( null === self::$clusterIndices ) {
+			self::$clusterIndices = [];
+		}
+
+		if ( in_array( $indexName, self::$clusterIndices, true ) ) {
+			return;
+		}
+
+		self::$clusterIndices[] = $indexName;
+	}
+
+	private function clearClusterIndicesCache() {
+		self::$clusterIndices = null;
+	}
+
+	/**
 	 * @param  string $indexName
 	 *
 	 * @return bool
 	 */
 	public function indexExists( $indexName ) {
-		return $this->elasticsearch->index_exists( $indexName );
+		$clusterIndices = $this->getClusterIndicesCache();
+
+		return in_array( $indexName, $clusterIndices, true );
 	}
 
 	/**
@@ -155,6 +191,7 @@ class Indices {
 		];
 
 		$this->elasticsearch->put_mapping( $indexName, $mapping );
+		$this->saveIndexInClusterCache( $indexName );
 	}
 
 	/**
@@ -168,6 +205,7 @@ class Indices {
 
 	public function clearAllIndices() {
 		$this->elasticsearch->delete_all_indices();
+		$this->clearClusterIndicesCache();
 	}
 
 	public function generateMissingIndices() {
