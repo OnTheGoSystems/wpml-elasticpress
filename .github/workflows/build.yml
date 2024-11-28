@@ -19,7 +19,7 @@ jobs:
       - name: Clean up files
         run: |
           rm ./.gitignore ./.gitlab-ci.yml
-          rm ./composer.* ./Makefile ./phpcs.* ./phpunit.xml ./run.sh
+          rm ./composer.* ./Makefile ./phpcs.* ./phpunit.xml ./run.sh ./phpstan.neon
           rm -Rf tests .vscode
           find . -type d | grep '.git' | xargs rm -rf
 
