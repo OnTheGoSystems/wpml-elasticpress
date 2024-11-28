@@ -60,6 +60,22 @@ This step isn't needed if you download a release instead.
 
 ## Changelog
 
+### 2.0.4
+- Improve the management of sites indices in Health stats.
+- Cache cluster indices for better performance.
+- Unsync documents when moved to a non indexable stati.
+- Fix some undefined variables.
+
+### 2.0.3
+- Fix the compatibility with ElasticPress 5.0.0.
+
+### 2.0.2
+- Fix the compatibility with the stopwords analyzers on ElasticPress 4.7.0 or newer.
+- Fix an error when deleting and trashing posts on PHP 8.0 or newer.
+
+### 2.0.1
+- Fix the name of the plugin main directory.
+
 ### 2.0.0
 - **Breaking change**: introduce a different index per language.
 - Fix `wpml_elasticpress` so it analiyzes posts in their own language when indexing them.
