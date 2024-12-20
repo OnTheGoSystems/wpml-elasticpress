@@ -100,6 +100,11 @@ class Plugin {
 					$indicesManager,
 					$currentLanguage
 				),
+				new FeatureSupport\Autosuggest(
+					$features,
+					$indicesManager,
+					$currentLanguage
+				),
 				new Stats\Health(
 					$indexables,
 					$networkActivated,

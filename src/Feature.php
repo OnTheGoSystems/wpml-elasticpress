@@ -25,6 +25,9 @@ class Feature extends \ElasticPress\Feature {
 	/** @var FeatureSupport\RelatedPosts */
 	private $frontendRelatedPosts;
 
+	/** @var FeatureSupport\Autosuggest */
+	private $frontendAutosuggest;
+
 	/** @var Stats\Health */
 	private $statsHealth;
 
@@ -59,6 +62,7 @@ class Feature extends \ElasticPress\Feature {
 		Sync\CLI                    $syncCli,
 		FeatureSupport\Search       $frontendSearch,
 		FeatureSupport\RelatedPosts $frontendRelatedPosts,
+		FeatureSupport\Autosuggest  $frontendAutosuggest,
 		Stats\Health                $statsHealth,
 		Stats\Report                $statsReport
 	) {
@@ -69,6 +73,7 @@ class Feature extends \ElasticPress\Feature {
 		$this->syncCli              = $syncCli;
 		$this->frontendSearch       = $frontendSearch;
 		$this->frontendRelatedPosts = $frontendRelatedPosts;
+		$this->frontendAutosuggest  = $frontendAutosuggest;
 		$this->statsHealth          = $statsHealth;
 		$this->statsReport          = $statsReport;
 
@@ -87,6 +92,7 @@ class Feature extends \ElasticPress\Feature {
 		$this->syncCli->addHooks();
 		$this->frontendSearch->addHooks();
 		$this->frontendRelatedPosts->addHooks();
+		$this->frontendAutosuggest->addHooks();
 		$this->statsHealth->addHooks();
 		$this->statsReport->addHooks();
 	}
