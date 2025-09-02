@@ -184,11 +184,13 @@ class Indices {
 		}
 
 		// Define language stemmer
-		$mapping['settings']['analysis']['analyzer']['default']['filter'][] = 'stemmer_' . $this->currentIndexLanguage;
-		$mapping['settings']['analysis']['filter']['stemmer_' . $this->currentIndexLanguage] = [
-			'type'        => 'stemmer',
-			'language'    => $languages['analyzer'],
-		];
+		if ( $this->languageHasStemmer( strtolower( $languages['analyzer'] ) ) ) {
+			$mapping['settings']['analysis']['analyzer']['default']['filter'][] = 'stemmer_' . $this->currentIndexLanguage;
+			$mapping['settings']['analysis']['filter']['stemmer_' . $this->currentIndexLanguage] = [
+				'type'        => 'stemmer',
+				'language'    => $languages['analyzer'],
+			];
+		}
 
 		$this->elasticsearch->put_mapping( $indexName, $mapping );
 		$this->saveIndexInClusterCache( $indexName );
