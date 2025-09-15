@@ -10,7 +10,7 @@ trait TranslateLanguages {
 	 *
 	 * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lang-analyzer.html
 	 */
-	private $wpmlLanguages = [
+	private static $wpmlLanguages = [
 		'arabic'     => [ 'ar' ],
 		'armenian'   => [ 'hy' ],
 		'basque'     => [ 'eu' ],
@@ -52,7 +52,7 @@ trait TranslateLanguages {
 	 *
 	 * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-snowball-tokenfilter.html
 	 */
-	private $snowballLanguages = [
+	private static $snowballLanguages = [
 		'Armenian',
 		'Basque',
 		'Catalan',
@@ -74,6 +74,46 @@ trait TranslateLanguages {
 		'Turkish',
 	];
 
+	/**
+	 * Languages supported in Elasticsearch stemmer token filters.
+	 *
+	 * @link https://www.elastic.co/docs/reference/text-analysis/analysis-stemmer-tokenfilter#analysis-stemmer-tokenfilter-language-parm
+	 */
+	private static $stemmerLanguages = [
+		'arabic',
+		'armenian',
+		'basque',
+		'bengali',
+		'brazilian',
+		'bulgarian',
+		'catalan',
+		'czech',
+		'danish',
+		'dutch',
+		'english',
+		'estonian',
+		'finnish',
+		'french',
+		'galician',
+		'german',
+		'greek',
+		'hindi',
+		'hungarian',
+		'indonesian',
+		'irish',
+		'italian',
+		'latvian',
+		'lithuanian',
+		'norwegian',
+		'persian',
+		'portuguese',
+		'romanian',
+		'russian',
+		'spanish',
+		'swedish',
+		'turkish',
+	];
+
 	/** @var string */
 	private $analyzerLanguage = 'english';
 
@@ -81,7 +121,7 @@ trait TranslateLanguages {
 	private $snowballLanguage = 'English';
 
 	/**
-	 * @param  string                                    $languageCode
+	 * @param string $languageCode
 	 *
 	 * @return array{analyzer: string, snowball: string} $languages
 	 */
@@ -104,5 +144,14 @@ trait TranslateLanguages {
 			'analyzer' => $analyzerLanguage,
 			'snowball' => $snowballLanguage,
 		];
+	}
+
+	/**
+	 * @param string $language
+	 *
+	 * @return bool
+	 */
+	private function languageHasStemmer( $language ) {
+		return in_array( $language, $this->stemmerLanguages, true );
 	}
 }
