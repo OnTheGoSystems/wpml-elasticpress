@@ -10,7 +10,7 @@ trait TranslateLanguages {
 	 *
 	 * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lang-analyzer.html
 	 */
-	private static $wpmlLanguages = [
+	private $wpmlLanguages = [
 		'arabic'     => [ 'ar' ],
 		'armenian'   => [ 'hy' ],
 		'basque'     => [ 'eu' ],
@@ -52,7 +52,7 @@ trait TranslateLanguages {
 	 *
 	 * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-snowball-tokenfilter.html
 	 */
-	private static $snowballLanguages = [
+	private $snowballLanguages = [
 		'Armenian',
 		'Basque',
 		'Catalan',
@@ -79,7 +79,7 @@ trait TranslateLanguages {
 	 *
 	 * @link https://www.elastic.co/docs/reference/text-analysis/analysis-stemmer-tokenfilter#analysis-stemmer-tokenfilter-language-parm
 	 */
-	private static $stemmerLanguages = [
+	private $stemmerLanguages = [
 		'arabic',
 		'armenian',
 		'basque',
