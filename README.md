@@ -60,6 +60,10 @@ This step isn't needed if you download a release instead.
 
 ## Changelog
 
+### 2.0.5
+- Fix a problem with a missing stemmer when creating an index for Thai content.
+- Update the sync command synopsis to accept the latest elasticpress arguments.
+
 ### 2.0.4
 - Improve the management of sites indices in Health stats.
 - Cache cluster indices for better performance.
