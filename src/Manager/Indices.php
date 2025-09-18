@@ -5,7 +5,7 @@ namespace WPML\ElasticPress\Manager;
 use ElasticPress\Elasticsearch;
 use ElasticPress\Indexables;
 use ElasticPress\Indexable;
-
+use ElasticPress\Feature\Documents\Documents;
 use WPML\ElasticPress\Traits\TranslateLanguages;
 
 class Indices {
@@ -21,6 +21,12 @@ class Indices {
 
 	/** @var Indexables */
 	private $indexables;
+
+	/** @var Documents */
+	private $documentsFeature;
+
+	/** @var Pipelines */
+	private $pipelinesManager;
 
 	/** @var array */
 	private $activeLanguages;
@@ -40,19 +46,25 @@ class Indices {
 	/**
 	 * @param Elasticsearch $elasticsearch
 	 * @param Indexables    $indexables
+	 * @param Documents     $documentsFeature
+	 * @param Pipelines     $pipelinesManager
 	 * @param array         $activeLanguages
 	 * @param string        $defaultLanguage
 	 */
 	public function __construct(
 		Elasticsearch $elasticsearch,
 		Indexables    $indexables,
+		Documents     $documentsFeature,
+		Pipelines     $pipelinesManager,
 		$activeLanguages,
 		$defaultLanguage
 	) {
-		$this->elasticsearch   = $elasticsearch;
-		$this->indexables      = $indexables;
-		$this->activeLanguages = $activeLanguages;
-		$this->defaultLanguage = $defaultLanguage;
+		$this->elasticsearch    = $elasticsearch;
+		$this->indexables       = $indexables;
+		$this->documentsFeature = $documentsFeature;
+		$this->pipelinesManager = $pipelinesManager;
+		$this->activeLanguages  = $activeLanguages;
+		$this->defaultLanguage  = $defaultLanguage;
 	}
 
 	public function addHooks() {
@@ -158,10 +170,19 @@ class Indices {
 	 */
 	public function generateIndexByIndexable( $indexable ) {
 		$indexName = $indexable->get_index_name();
+		// if document pipeline does not exist create it
+		if ( $this->documentsFeature->is_active() && ! $this->pipelinesManager->documentPipelineExists( $indexName ) ) {
+			$this->pipelinesManager->createDocumentPipeline();
+		}
 		if ( $this->indexExists( $indexName ) ) {
 			return;
 		}
 		$mapping = $indexable->generate_mapping();
+
+		// add attachments mapping if documents feature is active
+		if ( $this->documentsFeature->is_active() ) {
+			$mapping = $this->documentsFeature->attachments_mapping( $mapping );
+		}
 		if ( $this->defaultLanguage === $this->currentIndexLanguage ) {
 			$this->elasticsearch->put_mapping( $indexName, $mapping );
 			return;
