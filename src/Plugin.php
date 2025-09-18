@@ -32,12 +32,16 @@ class Plugin {
 			$elasticsearch        = \ElasticPress\Elasticsearch::factory();
 			$elasticsearchVersion = $elasticsearch->get_elasticsearch_version();
 			$indexables           = \ElasticPress\Indexables::factory();
+			$documentsFeature     = new \ElasticPress\Feature\Documents\Documents();
+			$pipelinesManager     = new Manager\Pipelines($elasticsearch, $documentsFeature);
 			$features             = \ElasticPress\Features::factory();
 			$networkActivated     = defined( 'EP_IS_NETWORK' ) && EP_IS_NETWORK;
 
 			$indicesManager       = new Manager\Indices(
 				$elasticsearch,
 				$indexables,
+				$documentsFeature,
+				$pipelinesManager,
 				$activeLanguages,
 				$defaultLanguage
 			);

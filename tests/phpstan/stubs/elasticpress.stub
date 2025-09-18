@@ -88,6 +88,25 @@ namespace ElasticPress {
 	 	 */
 		public function get_elasticsearch_version( $force = false ) {}
 
+		/**
+		 * Get an Elasticsearch pipeline
+		 *
+		 * @param  string $id Id of pipeline.
+		 * @since  2.3
+		 * @return WP_Error|bool|array
+		 */
+		public function get_pipeline( $id ) {}
+
+		/**
+		 * Put an Elasticsearch pipeline
+		 *
+		 * @param  string $id Pipeline id.
+		 * @param array  $args Args to send to ES.
+		 * @since  2.3
+		 * @return WP_Error|bool
+		 */
+		public function create_pipeline( $id, $args ) {}
+
 	}
 
 	class SyncManager {
@@ -251,4 +270,32 @@ namespace ElasticPress\Utils {
  	 */
 	function get_capability() {}
 
+}
+
+namespace ElasticPress\Feature\Documents {
+	class Documents{
+		/**
+		 * Returns true if feature is active
+		 *
+		 * @since  2.2
+		 * @return boolean
+		 */
+		public function is_active() {}
+
+		/**
+		 * Add attachments mapping
+		 *
+		 * @param  array $mapping Mapping to add to.
+		 * @since  2.3
+		 * @return array
+		 */
+		public function attachments_mapping( $mapping ) {}
+
+		/**
+		 * Put attachment pipeline
+		 *
+		 * @since  2.3
+		 */
+		public function create_pipeline() {}
+	}
 }
