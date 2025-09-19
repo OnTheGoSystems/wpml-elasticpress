@@ -16,6 +16,8 @@ class Indices {
 	// Before ElasticPress 4.7.0
 	const LEGACY_STOPWORD_FILTER_SLUG = 'stop';
 
+	const DOCUMENTS_PIPELINE_SUFFIX = '-attachment';
+
 	/** @var Elasticsearch */
 	private $elasticsearch;
 
@@ -154,10 +156,72 @@ class Indices {
 	}
 
 	/**
+	 * @param  string $indexName
+	 *
+	 * @return bool
+	 */
+	public function documentPipelineExists( string $indexName ): bool {
+		return $this->pipelineExists($indexName . self::DOCUMENTS_PIPELINE_SUFFIX );
+	}
+
+	/**
+	 * @param  string $pipelineId
+	 *
+	 * @return bool
+	 */
+	public function pipelineExists( string $pipelineId ): bool {
+		$response = $this->elasticsearch->get_pipeline($pipelineId);
+
+		return in_array( $pipelineId, $response, true );
+	}
+
+	/**
+	 * @param string $indexName
+	 *
+	 * @return void
+	 */
+	public function createDocumentPipeline( string $indexName ): void {
+		$args = array(
+			'description' => 'Extract attachment information',
+			'processors'  => array(
+				array(
+					'foreach' => array(
+						'field'     => 'attachments',
+						'processor' => array(
+							'attachment' => array(
+								'target_field'   => '_ingest._value.attachment',
+								'field'          => '_ingest._value.data',
+								'ignore_missing' => true,
+								'indexed_chars'  => -1,
+							),
+						),
+					),
+				),
+				array(
+					'foreach' => array(
+						'field'     => 'attachments',
+						'processor' => array(
+							'remove' => array(
+								'field' => '_ingest._value.data',
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$this->elasticsearch->create_pipeline( $indexName . self::DOCUMENTS_PIPELINE_SUFFIX, $args );
+	}
+
+	/**
 	 * @param Indexable $indexable
 	 */
 	public function generateIndexByIndexable( $indexable ) {
 		$indexName = $indexable->get_index_name();
+		// if document pipeline does not exist create it
+		if ( !$this->documentPipelineExists( $indexName )) {
+			$this->createDocumentPipeline( $indexName );
+		}
 		if ( $this->indexExists( $indexName ) ) {
 			return;
 		}
