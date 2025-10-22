@@ -1,7 +1,5 @@
 # WPML ElasticPress integration
 
-![OTGS CI](https://github.com/OnTheGoSystems/wpml-elasticpress/workflows/OTGS%20CI/badge.svg)
-
 ## The main goal
 
 By default, ElasticPress indexes posts using a single, default language to analyze their content.
@@ -47,7 +45,7 @@ ElasticPress provides several features. We provide compatibility with some of th
 * [x] Related Posts
 * [ ] Custom Search Results
 * [ ] Protected Content
-* [ ] Documents
+* [x] Documents
 
 Additional compatibility with other features will be added in future releases.
 
@@ -59,6 +57,9 @@ After cloning this repository you need to generate the autoloader:
 This step isn't needed if you download a release instead.
 
 ## Changelog
+
+### 2.1.0
+- Bring support for the `Documents` feature.
 
 ### 2.0.5
 - Fix a problem with a missing stemmer when creating an index for Thai content.
