@@ -43,8 +43,8 @@ trait CrudPropagation {
 				$language = $this->defaultLanguage;
 			}
 
-			$this->mainIdsPerLanguage[ $language ]    = [];
-			$this->relatedIdsPerLanguage[ $language ] = [];
+			$this->mainIdsPerLanguage[ $language ]    ??= [];
+			$this->relatedIdsPerLanguage[ $language ] ??= [];
 
 			$this->registerObject( $object, $language );
 		}
