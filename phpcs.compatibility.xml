@@ -2,7 +2,7 @@
 <ruleset name="WPML">
 	<description>WPML Coding Standards</description>
 
-	<config name="testVersion" value="7.0-"/>
+	<config name="testVersion" value="7.4-"/>
 
 	<rule ref="PHPCompatibilityWP"/>
 
