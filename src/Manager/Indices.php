@@ -227,7 +227,14 @@ class Indices {
 	}
 
 	public function clearAllIndices() {
-		$this->elasticsearch->delete_all_indices();
+		$indexables = $this->indexables->get_all();
+		foreach ( $this->activeLanguages as $language ) {
+			$this->setCurrentIndexLanguage( $language );
+			foreach ( $indexables as $indexable ) {
+				$indexable->delete_index();
+			}
+			$this->clearCurrentIndexLanguage();
+		}
 		$this->clearClusterIndicesCache();
 	}
 

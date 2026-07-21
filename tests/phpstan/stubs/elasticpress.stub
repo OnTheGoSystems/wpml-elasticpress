@@ -185,6 +185,12 @@ namespace ElasticPress {
 		public function get_index_name( $blog_id = null ) {}
 
 		/**
+		 * @param  int $blog_id `null` means current blog.
+		 * @return boolean
+		 */
+		public function delete_index( $blog_id = null ) {}
+
+		/**
 		 * @return array
 		 */
 		public function get_indexable_post_status() {}
