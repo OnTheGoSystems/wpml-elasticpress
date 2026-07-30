@@ -178,7 +178,6 @@ trait CrudPropagation {
 			return;
 		}
 
-		$this->indicesManager->generateIndexByIndexable( $postIndexable );
 		$postIndexable->bulk_index_dynamically( $ids );
 	}
 
@@ -193,20 +192,11 @@ trait CrudPropagation {
 			return [];
 		}
 
-		$indexName = $postIndexable->get_index_name();
-		if ( ! $this->indicesManager->indexExists( $indexName ) ) {
-			return [];
+		foreach ( $ids as $id ) {
+			$postIndexable->delete( $id );
 		}
-		return array_values(
-			array_filter( $ids, function( $id ) use ( $postIndexable ) {
-				// Skip docs that do not exist in the current index
-				if ( false === $postIndexable->get( $id ) ) {
-					return false;
-				}
-				$postIndexable->delete( $id );
-				return true;
-			} )
-		);
+
+		return array_values( $ids );
 	}
 
 	/**
