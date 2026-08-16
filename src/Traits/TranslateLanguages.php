@@ -18,6 +18,7 @@ trait TranslateLanguages {
 		'brazilian'  => [ 'pt-br' ],
 		'bulgarian'  => [ 'bg' ],
 		'catalan'    => [ 'ca' ],
+		'cjk'        => [ 'zh-hans', 'zh-hant', 'ja', 'ko' ],
 		'czech'      => [ 'cs' ],
 		'danish'     => [ 'da' ],
 		'dutch'      => [ 'nl' ],
