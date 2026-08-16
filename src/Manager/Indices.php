@@ -231,7 +231,10 @@ class Indices {
 		foreach ( $this->activeLanguages as $language ) {
 			$this->setCurrentIndexLanguage( $language );
 			foreach ( $indexables as $indexable ) {
-				$indexable->delete_index();
+				if ( false === $indexable->delete_index() && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+					// A surviving index is skipped by generateMissingIndices() and keeps stale data.
+					error_log( 'WPML ElasticPress: could not delete index ' . $indexable->get_index_name() );
+				}
 			}
 			$this->clearCurrentIndexLanguage();
 		}
