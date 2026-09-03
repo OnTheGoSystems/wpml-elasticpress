@@ -12,6 +12,22 @@ class Plugin {
 	// After ElasticPress 5.0.0, the Dashboard sync is run over the REST API.
 	const DASHBOARD_SYNC_API_CHANGE_V1 = '5.0.0';
 
+	/**
+	 * Checks the WPML version against wpml-dependencies.json.
+	 *
+	 * WPML core declares WPML_Core_Version_Check and loads before
+	 * "plugins_loaded" priority 11, so the class is available here.
+	 *
+	 * @return bool
+	 */
+	private static function hasSupportedCore() {
+		if ( ! class_exists( 'WPML_Core_Version_Check' ) ) {
+			return false;
+		}
+
+		return \WPML_Core_Version_Check::is_ok( WPMLELASTICPRESS_PLUGIN_PATH . '/wpml-dependencies.json' );
+	}
+
 	public static function init() {
 		add_action( 'plugins_loaded', function () {
 			if ( ! defined( 'EP_VERSION' ) || version_compare( EP_VERSION, '3.0.0', '<' ) ) {
@@ -19,6 +35,10 @@ class Plugin {
 			}
 
 			if ( ! defined( 'ICL_SITEPRESS_VERSION' ) ) {
+				return;
+			}
+
+			if ( ! self::hasSupportedCore() ) {
 				return;
 			}
 
