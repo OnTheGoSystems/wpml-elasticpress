@@ -40,7 +40,11 @@ class DashboardAjax extends Dashboard {
 			exit;
 		}
 
-		if ( ! current_user_can( Utils\get_capability() ) ) {
+		// ElasticPress added get_capability() in 4.5.0. This AJAX sync serves every
+		// version below 5.0.0, so older ones fall back to the administrator capability.
+		$capability = function_exists( 'ElasticPress\Utils\get_capability' ) ? Utils\get_capability() : 'manage_options';
+
+		if ( ! current_user_can( $capability ) ) {
 			wp_send_json_error( null, 403 );
 			exit;
 		}
