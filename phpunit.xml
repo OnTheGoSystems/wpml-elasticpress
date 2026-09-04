@@ -1,24 +1,18 @@
-<phpunit
-		bootstrap="./tests/phpunit/bootstrap.php"
-		backupGlobals="false"
-		colors="true"
-		convertErrorsToExceptions="true"
-		convertNoticesToExceptions="true"
-		convertWarningsToExceptions="true"
->
-	<testsuites>
-		<testsuite name="my-project">
-			<directory suffix="Test.php">./tests/phpunit/</directory>
-		</testsuite>
-	</testsuites>
-	<filter>
-		<whitelist>
-			<directory suffix=".php">./</directory>
-			<exclude>
-				<directory>./locale</directory>
-				<directory>./tests</directory>
-				<directory>./vendor</directory>
-			</exclude>
-		</whitelist>
-	</filter>
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="./tests/phpunit/bootstrap.php" backupGlobals="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage>
+    <include>
+      <directory suffix=".php">./</directory>
+    </include>
+    <exclude>
+      <directory>./locale</directory>
+      <directory>./tests</directory>
+      <directory>./vendor</directory>
+    </exclude>
+  </coverage>
+  <testsuites>
+    <testsuite name="my-project">
+      <directory suffix="Test.php">./tests/phpunit/</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>
