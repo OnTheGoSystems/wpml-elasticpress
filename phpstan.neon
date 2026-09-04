@@ -6,6 +6,7 @@ parameters:
     - tests/phpstan/bootstrap.php
     - tests/phpstan/stubs/elasticpress.stub
     - tests/phpstan/stubs/wp-cli.stub
+    - tests/phpstan/stubs/wpml-request-policy.stub
   paths:
     - src
   dynamicConstantNames:

@@ -73,12 +73,32 @@ class Search extends Field {
 		if (
 			isset( $_GET['lang'] )
 			&& is_string( $_GET['lang'] )
-			&& in_array( $_GET['lang'], $this->activeLanguages, true )
+			&& $this->isViewerVisibleLanguage( $_GET['lang'] )
 		) {
 			$lang = $_GET['lang'];
 		}
 
 		return $lang;
+	}
+
+	/**
+	 * Whether the current viewer may select this language for searching.
+	 *
+	 * `$this->activeLanguages` is resolved at plugins_loaded, before `init`, when
+	 * WPML's show_hidden() is still true for every request, so it contains hidden
+	 * languages regardless of the viewer. That set is the right one for indexing.
+	 * For a requester-selected search language, resolve the viewer-sensitive
+	 * active-language set at query time instead: hidden languages are only
+	 * present when Core's show_hidden() policy allows this viewer to see them.
+	 *
+	 * @param string $lang
+	 *
+	 * @return bool
+	 */
+	private function isViewerVisibleLanguage( $lang ) {
+		$viewerLanguages = array_keys( (array) apply_filters( 'wpml_active_languages', [] ) );
+
+		return in_array( $lang, $viewerLanguages, true );
 	}
 
 }

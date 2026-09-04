@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * WPML core request-policy model, consumed by src/Request/Ajax.php when the
+ * paired core provides it. Signatures mirror sitepress-multilingual-cms
+ * classes/request/{adapter,policy}.
+ */
+
+namespace WPML\Request\Adapter {
+
+	final class Ajax {
+
+		/**
+		 * @param string                      $action
+		 * @param \WPML\Request\Policy\Policy $policy
+		 * @param callable                    $callback
+		 * @param int                         $priority
+		 * @param int                         $acceptedArgs
+		 */
+		public static function register( $action, \WPML\Request\Policy\Policy $policy, callable $callback, $priority = 10, $acceptedArgs = 1 ): void {}
+
+		/**
+		 * @param string   $hostAction
+		 * @param callable $callback
+		 * @param string   $reason
+		 * @param int      $priority
+		 * @param int      $acceptedArgs
+		 * @param bool     $alsoNopriv
+		 */
+		public static function listen( $hostAction, callable $callback, $reason, $priority = 10, $acceptedArgs = 1, $alsoNopriv = false ): void {}
+
+	}
+
+}
+
+namespace WPML\Request\Policy {
+
+	final class Registry {
+
+		/**
+		 * @param string $path
+		 */
+		public static function ownRoot( $path ): void {}
+
+	}
+
+	final class Authenticity {
+
+		/**
+		 * @param string          $action
+		 * @param string|string[] $fields
+		 */
+		public static function actionNonce( $action, $fields = 'nonce' ): self {}
+
+		/**
+		 * @param string $reason
+		 */
+		public static function none( $reason ): self {}
+
+	}
+
+	final class Policy {
+
+		/**
+		 * @param string|string[] $capabilities
+		 */
+		public static function capability( $capabilities, Authenticity $authenticity ): self {}
+
+		/**
+		 * @param string $reason
+		 */
+		public static function authenticated( Authenticity $authenticity, $reason ): self {}
+
+		/**
+		 * @param string $description
+		 */
+		public static function authorize( callable $decider, Authenticity $authenticity, $description ): self {}
+
+		/**
+		 * @param string $reason
+		 */
+		public static function publicAccess( $reason, ?Authenticity $authenticity = null ): self {}
+
+		/**
+		 * @param string $reason
+		 */
+		public static function machine( callable $verifier, $reason ): self {}
+
+	}
+
+}
