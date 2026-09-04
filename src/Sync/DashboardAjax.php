@@ -16,11 +16,10 @@ class DashboardAjax extends Dashboard {
 			return;
 		}
 
-		// wpmldev-7976: these ride ElasticPress's own dashboard-sync actions at
-		// priority 9 and take the request over (they answer and exit), so the
-		// host's capability check at priority 10 never runs - isDashboardSync()
-		// therefore enforces ElasticPress's own sync capability itself, as the
-		// REST twin (DashboardRest) already does.
+		// These ride ElasticPress's own dashboard-sync actions at priority 9 and
+		// answer the request themselves, so isDashboardSync() checks
+		// ElasticPress's own sync capability directly, as DashboardRest already
+		// does.
 		\WPML\ElasticPress\Request\Ajax::listen(
 			'ep_index',
 			[ $this, 'action_wp_ajax_ep_index' ],

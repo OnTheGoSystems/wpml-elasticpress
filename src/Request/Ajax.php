@@ -3,7 +3,7 @@
 namespace WPML\ElasticPress\Request;
 
 /**
- * Request-policy adapter for this plugin's admin-ajax handlers (wpmldev-7976).
+ * Request-policy adapter for this plugin's admin-ajax handlers.
  *
  * Every handler this plugin binds to `wp_ajax_*` / `wp_ajax_nopriv_*` goes
  * through here with a declarative policy spec, never through a raw

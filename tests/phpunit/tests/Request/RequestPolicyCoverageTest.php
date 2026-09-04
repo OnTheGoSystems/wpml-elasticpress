@@ -3,14 +3,13 @@
 namespace WPML\ElasticPress\Request;
 
 /**
- * Architectural regression for wpmldev-7976: every admin-ajax / admin-post /
- * REST / XML-RPC binding in this plugin goes through the request-policy
- * adapter (`WPML\ElasticPress\Request\Ajax`), never through a raw registration. The universe is
- * the plugin's own PHP tree; a new handler bound without a policy fails here.
+ * Architectural test: every admin-ajax / admin-post / REST / XML-RPC binding
+ * in this plugin goes through the request-policy adapter
+ * (`WPML\ElasticPress\Request\Ajax`), never through a raw registration. The
+ * universe is the plugin's own PHP tree; a new handler bound without a policy
+ * fails here.
  *
  * @group request-policy
- * @group security
- * @group wpmldev-7976
  */
 class RequestPolicyCoverageTest extends \PHPUnit\Framework\TestCase {
 
