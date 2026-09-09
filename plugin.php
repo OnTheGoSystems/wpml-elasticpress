@@ -5,7 +5,7 @@
  * Description: Add full WPML support for ElasticPress.
  * Author: OnTheGoSystems
  * Author URI: http://www.onthegosystems.com/
- * Version: 3.0
+ * Version: 5.0.0-rc.1
  * Plugin Slug: wpmlelasticpress
  *
  * @package wpml/bridge/elasticpress
@@ -33,7 +33,7 @@ if ( defined( 'WPMLELASTICPRESS_VERSION' ) ) {
 	return;
 }
 
-define( 'WPMLELASTICPRESS_VERSION', '3.0' );
+define( 'WPMLELASTICPRESS_VERSION', '5.0.0-rc.1' );
 define( 'WPMLELASTICPRESS_PLUGIN_PATH', dirname( __FILE__ ) );
 
 require_once WPMLELASTICPRESS_PLUGIN_PATH . '/vendor/autoload.php';
