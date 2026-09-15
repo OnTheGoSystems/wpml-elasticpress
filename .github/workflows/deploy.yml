@@ -9,7 +9,8 @@ env:
   AWS_REGION: "us-east-1"
 permissions:
   id-token: write
-  contents: read
+  # Needed to create the release and attach the package to it.
+  contents: write
 
 jobs:
   build:
@@ -48,3 +49,14 @@ jobs:
       - name: Deploy artifact
         run:
           aws s3 cp ./wpml-elasticpress.${{ github.ref_name }}.zip s3://${{ secrets.S3_BUCKET }}/wpml-elasticpress.${{ github.ref_name }}.zip
+
+      # The release is a DRAFT on purpose. The repository is public, so the
+      # package must not be downloadable before the release date. A person
+      # publishes the draft when the whole release goes out.
+      - name: Attach the package to a draft GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: wpml-elasticpress.${{ github.ref_name }}.zip
+          draft: true
+          # A tag with a suffix is a pre-release, for example 5.1.0-rc.1.
+          prerelease: ${{ contains(github.ref_name, '-') }}
