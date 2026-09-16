@@ -58,6 +58,14 @@ This step isn't needed if you download a release instead.
 
 ## Changelog
 
+### 5.0.0
+- Move the version number from 2.1.0 to 5.0.0. Every WPML component now shares the same major version.
+- Require WPML 5.0.0 or newer. On an older WPML the plugin does not load.
+- Validate the search language when the query runs, and run the admin-ajax handlers through a request policy.
+- Fix `clearAllIndices()` so it deletes only the indices of the current site.
+- Skip the index existence check when a single post is synced.
+- Fix an error when the language ids are not ready before `propagateIds` runs.
+
 ### 2.1.0
 - Bring support for the `Documents` feature.
 
